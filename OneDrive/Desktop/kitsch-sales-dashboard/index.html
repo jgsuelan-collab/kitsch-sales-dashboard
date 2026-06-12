@@ -191,24 +191,24 @@
 const DATA = {
   // ── Reporting period ──────────────────────────────────
   // All dates based on California (Pacific) time — matches NetSuite
-  asOfDay:     11,      // Last day actuals were pulled (June 1–11, California time)
+  asOfDay:     12,      // Last day actuals were pulled (June 1–12, California time)
   dataMonth:   5,       // 0-indexed: 5 = June
   dataYear:    2026,
 
   // ── Actuals as of asOfDay ───────────────────────────────
   // DTC: from NetSuite customsearch1373 (Sales Summary by Customer & SKU) MTD
-  dtcActual:   4860944,
+  dtcActual:   4861111,
   dtcOOC:      0,
 
   // Amazon: from NetSuite customsearch1373 MTD
-  amzActual:   5979375,
+  amzActual:   5992065,
   amzOOC:      0,
 
-  // Wholesale: customsearch1373 actuals June 1–11 · Report 388 OOC (June ship dates, no Shopify)
+  // Wholesale: customsearch1373 actuals June 1–12 · Report 388 OOC (June ship dates, no Shopify)
   wsChannels: [
     { name: 'Ulta Inc.',               actual: 883449,  ooc: 735586,  fc: 3281200 },
-    { name: 'Target',                  actual: 1365197, ooc: 2625350, fc: 4521640 },
-    { name: 'Faire',                   actual: 421269,  ooc: 252,     fc: 975637  },
+    { name: 'Target',                  actual: 1394174, ooc: 2515522, fc: 4521640 },
+    { name: 'Faire',                   actual: 421269,  ooc: 0,       fc: 975637  },
     { name: 'CVS Health',              actual: 122124,  ooc: 27692,   fc: 181000  },
     { name: 'Walgreens',               actual: 808857,  ooc: 54023,   fc: 230000  },
     { name: 'Walmart',                 actual: 131256,  ooc: 36765,   fc: 315200  },
@@ -216,16 +216,16 @@ const DATA = {
     { name: "Kohl's Inc.",             actual: 103884,  ooc: 42433,   fc: 66950   },
     { name: 'Meijer',                  actual: 79602,   ooc: 52462,   fc: 61538   },
     { name: 'Boots UK Ltd.',           actual: 241178,  ooc: 0,       fc: 95000   },
-    { name: 'HEB',                     actual: 0,       ooc: 75922,   fc: 162869  },
+    { name: 'HEB',                     actual: 0,       ooc: 79803,   fc: 162869  },
     { name: 'KROGER',                  actual: 0,       ooc: 90120,   fc: 289000  },
     { name: 'Nordstrom Rack/Hautelook',actual: 0,       ooc: 363731,  fc: 394000  },
     { name: 'Scheels',                 actual: 0,       ooc: 32422,   fc: 105000  },
     { name: 'Off-Price',               actual: 297157,  ooc: 677734,  fc: 900000  },
     { name: 'Business Development',    actual: 0,       ooc: 0,       fc: 103020  },
-    { name: 'Grocery',                 actual: 8302,    ooc: 55727,   fc: 232100  },
-    { name: 'Specialty',               actual: 2419,    ooc: 96411,   fc: 224979  },
-    { name: 'International',           actual: 0,       ooc: 7707,    fc: 150150  },
-    { name: 'Other - Misc',            actual: 1434861, ooc: 0,       fc: 328900  },
+    { name: 'Grocery',                 actual: 8302,    ooc: 68129,   fc: 232100  },
+    { name: 'Specialty',               actual: 2419,    ooc: 87570,   fc: 224979  },
+    { name: 'International',           actual: 0,       ooc: 8915,    fc: 150150  },
+    { name: 'Other - Misc',            actual: 1434877, ooc: 0,       fc: 328900  },
   ],
 
   // ── Forecasts (June 2026 — from June tab) ──
@@ -233,11 +233,11 @@ const DATA = {
   amzFC:     13768064,
   wsFC:      12781183,  // Sum of wsChannels[*].fc · Total FC = $41,102,095
 
-  // ── LY same period: June 1–11, 2025 (pro-rated June 2025 ÷ 30 × 11)
+  // ── LY same period: June 1–12, 2025 (pro-rated June 2025 ÷ 30 × 12)
   // Source: NS - 12 Kitsch Per SKU Analysis Report Dec 2025 (Key Customer tab)
-  dtcLY:     3552070,   // $9,688,555 Jun 2025 × 11/30
-  amzLY:     4116549,   // $11,226,952 Jun 2025 × 11/30
-  wsLY:      3504995,   // $9,559,078 Jun 2025 × 11/30
+  dtcLY:     3875422,   // $9,688,555 Jun 2025 × 12/30
+  amzLY:     4490781,   // $11,226,952 Jun 2025 × 12/30
+  wsLY:      3823631,   // $9,559,078 Jun 2025 × 12/30
 };
 
 // ── Derived totals (auto-calculated, do not edit) ────────
