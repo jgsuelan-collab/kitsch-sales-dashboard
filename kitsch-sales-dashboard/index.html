@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kitsch — Sales vs Forecast</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+  :root {
+    color-scheme:light;
+    --cream:#f7f3ee;--cream-dark:#ede7de;--sand:#d9cfc4;--taupe:#b5a898;
+    --brown:#8c7b6b;--charcoal:#2c2a28;--ink:#1a1815;
+    --accent:#c9734a;--accent-muted:#e8b9a5;
+    --green:#4a7c59;--green-light:#d4ead9;
+    --red:#9b3d3d;--red-light:#f2dada;
+    --yellow:#c49a2b;--yellow-light:#f5ead0;
+    --purple:#8b7bb5;--purple-light:#e8e4f3;
+    --blue:#3a6fa8;--blue-light:#d8e6f5;
+    --font:'Georgia','Times New Roman',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.5;}
+
+  /* ── Header ── */
+  .header{background:var(--ink);color:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--accent);}
+  .header-left{display:flex;align-items:center;gap:14px;}
+  .header-logo{font-family:var(--font);font-size:21px;letter-spacing:0.08em;}
+  .header-sub{font-size:10px;text-transform:uppercase;letter-spacing:0.15em;color:var(--taupe);margin-top:2px;}
+  .header-divider{width:1px;height:34px;background:#444;}
+  .header-title{font-size:13px;color:#ccc;}
+  .header-right{display:flex;align-items:center;gap:14px;}
+  .live-badge{display:flex;align-items:center;gap:5px;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.1em;}
+  .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .data-stamp{font-size:11px;color:#666;background:rgba(255,255,255,.07);padding:4px 10px;border-radius:4px;text-align:right;line-height:1.6;}
+  .data-stamp .viewing{color:#aaa;display:block;}
+  .data-stamp .asof{color:#666;display:block;}
+
+  /* ── Nav ── */
+  .nav-tabs{background:#222;display:flex;padding:0 28px;border-bottom:1px solid #333;overflow-x:auto;}
+  .nav-tab{padding:10px 18px;font-size:12px;color:#888;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;text-transform:uppercase;letter-spacing:0.08em;}
+  .nav-tab:hover{color:#ccc;}
+  .nav-tab.active{color:#fff;border-bottom-color:var(--accent);}
+
+  .main{padding:20px 28px 40px;max-width:1340px;margin:0 auto;}
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+
+  /* ── Command Brief ── */
+  .command-brief{background:var(--ink);color:#fff;border-radius:8px;padding:20px 24px;margin-bottom:18px;}
+  .brief-label{font-size:10px;text-transform:uppercase;letter-spacing:0.18em;color:var(--accent-muted);margin-bottom:10px;}
+  .norm-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  .norm-badge{background:rgba(255,255,255,0.07);border-radius:6px;padding:8px 14px;}
+  .norm-badge-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;}
+  .norm-badge-val{font-size:18px;font-weight:700;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;}
+  .norm-badge-val.big{font-size:26px;letter-spacing:-0.02em;}
+  .norm-badge-val.ahead{color:#6dbf85;}
+  .norm-badge-val.neutral{color:#fff;}
+  .norm-badge-val.muted{color:#aaa;}
+  .norm-arrow{color:#555;font-size:18px;}
+  .norm-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;padding:4px 10px;border-radius:12px;}
+  .norm-tag.ahead{background:var(--green-light);color:var(--green);}
+  .norm-tag.behind{background:var(--red-light);color:var(--red);}
+  .brief-leader{font-family:var(--font);font-size:14px;color:#ddd;line-height:1.6;margin-bottom:14px;}
+  .brief-leader strong{color:#fff;}
+
+  /* ── Sprint Tracker ── */
+  .sprint-header{font-size:10px;text-transform:uppercase;letter-spacing:0.15em;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:10px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px;}
+  .sprint-ctx{font-size:11px;color:#555;text-transform:none;letter-spacing:0;font-style:italic;}
+  .sprint-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .sprint-box{background:rgba(255,255,255,0.04);border-radius:5px;padding:9px 11px;border-left:2px solid;}
+  .sprint-box.s-total{border-left-color:rgba(232,185,165,0.4);}
+  .sprint-box.s-dtc{border-left-color:rgba(168,153,204,0.4);}
+  .sprint-box.s-amz{border-left-color:rgba(212,176,80,0.4);}
+  .sprint-box.s-ws{border-left-color:rgba(106,175,132,0.4);}
+  .sprint-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#666;margin-bottom:3px;}
+  .sprint-lbl.total{color:#887766;}
+  .sprint-lbl.dtc{color:#8878aa;}
+  .sprint-lbl.amz{color:#998844;}
+  .sprint-lbl.ws{color:#558866;}
+  .sprint-days{font-size:10px;color:#555;margin-bottom:4px;}
+  .sprint-days strong{color:#888;}
+  .sprint-val{font-size:15px;font-weight:700;color:#ccc;}
+  .sprint-val.good{color:#5aaa75;}
+  .sprint-val.warn{color:#c8a050;}
+  .sprint-sub{font-size:10px;color:#555;margin-top:1px;}
+  .sprint-proj{font-size:10px;margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,.05);}
+  .sprint-proj.over{color:#5aaa75;}
+  .sprint-proj.under{color:#c07050;}
+  .sprint-closed{font-size:13px;font-weight:600;color:#5aaa75;}
+
+  /* ── Section ── */
+  .section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
+  .section-title{font-family:var(--font);font-size:15px;color:var(--charcoal);}
+  .section-meta{font-size:11px;color:var(--taupe);}
+
+  /* ── Channel Cards ── */
+  .channel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+  .channel-card{background:#fff;border-radius:8px;border:1px solid var(--cream-dark);overflow:hidden;}
+  .ch-top{padding:14px 16px 12px;border-bottom:1px solid var(--cream-dark);}
+  .ch-top.dtc{border-top:3px solid var(--purple);}
+  .ch-top.amazon{border-top:3px solid var(--yellow);}
+  .ch-top.wholesale{border-top:3px solid var(--green);}
+  .ch-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+  .ch-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--brown);}
+  .ch-badges{display:flex;gap:5px;flex-wrap:wrap;}
+  .ch-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;}
+  .ch-badge.green{background:var(--green-light);color:var(--green);}
+  .ch-badge.yellow{background:var(--yellow-light);color:var(--yellow);}
+  .ch-badge.red{background:var(--red-light);color:var(--red);}
+  .ch-badge.blue{background:var(--blue-light);color:var(--blue);}
+  .ch-actual{font-size:26px;font-weight:700;color:var(--ink);letter-spacing:-0.02em;line-height:1;}
+  .ch-fc-row{display:flex;justify-content:space-between;align-items:center;margin-top:4px;}
+  .ch-fc-label{font-size:12px;color:var(--taupe);}
+  .ch-delta{font-size:12px;font-weight:600;}
+  .ch-delta.pos{color:var(--green);}
+  .ch-delta.neg{color:var(--red);}
+  .ch-yoy-row{display:flex;align-items:center;justify-content:space-between;margin-top:7px;padding-top:7px;border-top:1px dashed var(--cream-dark);}
+  .ch-yoy-label{font-size:10px;color:var(--taupe);text-transform:uppercase;letter-spacing:0.08em;}
+  .ch-yoy-val{font-size:12px;font-weight:700;}
+  .ch-yoy-val.up{color:var(--green);}
+  .ch-yoy-ly{font-size:11px;color:var(--taupe);}
+  /* Progress */
+  .ch-norm-wrap{margin-top:10px;}
+  .ch-norm-labels{display:flex;justify-content:space-between;margin-bottom:3px;}
+  .ch-norm-ach{font-size:12px;font-weight:700;}
+  .ch-norm-norm{font-size:11px;color:var(--taupe);}
+  .prog-track{height:6px;background:var(--cream-dark);border-radius:3px;position:relative;overflow:visible;}
+  .prog-fill{height:100%;border-radius:3px;}
+  .norm-mk{position:absolute;top:-4px;width:2px;height:14px;background:var(--taupe);border-radius:1px;}
+  /* Events */
+  .ch-events{padding:12px 16px;}
+  .ev-label{font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--taupe);margin-bottom:7px;font-weight:600;}
+  .ev-line{display:flex;gap:8px;margin-bottom:5px;align-items:flex-start;}
+  .ev-line:last-child{margin-bottom:0;}
+  .ev-date{font-size:11px;color:var(--accent);font-weight:700;min-width:50px;padding-top:1px;white-space:nowrap;}
+  .ev-desc{font-size:12px;color:var(--charcoal);line-height:1.4;}
+
+  /* ── Sales Report Table ── */
+  .table-card{background:#fff;border-radius:8px;border:1px solid var(--cream-dark);overflow:hidden;margin-bottom:18px;}
+  .table-card-header{padding:14px 18px;border-bottom:1px solid var(--cream-dark);display:flex;justify-content:space-between;align-items:center;}
+  table{width:100%;border-collapse:collapse;}
+  thead tr{background:var(--cream);}
+  th{padding:9px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.11em;color:var(--brown);border-bottom:1px solid var(--cream-dark);font-weight:600;white-space:nowrap;}
+  th.r{text-align:right;}
+  td{padding:8px 12px;font-size:12.5px;color:var(--charcoal);border-bottom:1px solid var(--cream-dark);}
+  td.r{text-align:right;}
+  td.num{font-variant-numeric:tabular-nums;}
+  tr:last-child td{border-bottom:none;}
+  tr.total-row td{font-weight:700;background:var(--cream);color:var(--ink);}
+  tr.group-row td{background:#f9f7f5;font-weight:600;font-size:10px;color:var(--brown);text-transform:uppercase;letter-spacing:0.1em;padding:5px 12px;}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+  .badge.green{background:var(--green-light);color:var(--green);}
+  .badge.yellow{background:var(--yellow-light);color:var(--yellow);}
+  .badge.red{background:var(--red-light);color:var(--red);}
+  .badge.blue{background:var(--blue-light);color:var(--blue);}
+
+  /* ── Charts ── */
+  .chart-card{background:#fff;border-radius:8px;padding:18px;border:1px solid var(--cream-dark);margin-bottom:18px;}
+
+  /* ── YTD cards ── */
+  .ytd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+  .ytd-card{background:#fff;border-radius:8px;padding:14px 16px;border:1px solid var(--cream-dark);border-top:3px solid var(--accent);}
+  .ytd-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--taupe);margin-bottom:6px;}
+  .ytd-val{font-size:21px;font-weight:700;color:var(--ink);letter-spacing:-0.02em;}
+  .ytd-fc{font-size:12px;color:var(--taupe);margin:2px 0 6px;}
+  .ytd-ach{font-size:13px;font-weight:700;}
+  .ytd-delta{font-size:12px;margin-top:3px;font-weight:600;}
+  .ytd-yoy{font-size:11px;color:var(--taupe);margin-top:5px;padding-top:5px;border-top:1px dashed var(--cream-dark);}
+  .ytd-yoy span{font-weight:700;color:var(--green);}
+
+  .footer{text-align:center;padding:14px;font-size:11px;color:var(--taupe);border-top:1px solid var(--cream-dark);}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+  DATA BLOCK — UPDATE THIS SECTION EACH TIME YOU REFRESH
+  Sources:
+    actuals (DTC)       → Shopify portal, MTD period
+    actuals (Amazon)    → Amazon Seller Central report, MTD
+    actuals (Wholesale) → NetSuite "Sales Summary by Customer & SKU", MTD
+                          Tagged per Level 5 from Customer Masterfile
+    OOC (Wholesale)     → NetSuite "KJ - Sales Actuals vs Forecast OOC"
+                          Filter: shipping due date = reporting month
+                          Remove Shopify customers, tag per Level 5
+    forecasts           → YTD tab, Forecast columns AG–AR
+═══════════════════════════════════════════════════════ -->
+<script id="data-config">
+const DATA = {
+  // ── Reporting period ──────────────────────────────────
+  // All dates based on California (Pacific) time — matches NetSuite
+  asOfDay:     8,       // Last day actuals were pulled (June 1–8, California time)
+  dataMonth:   5,       // 0-indexed: 5 = June
+  dataYear:    2026,
+
+  // ── Actuals as of asOfDay ───────────────────────────────
+  // DTC: from Shopify portal (MTD). NetSuite value used here as proxy.
+  dtcActual:   3478486,
+  dtcOOC:      0,
+
+  // Amazon: from Amazon Seller Central (MTD). NetSuite value used here as proxy.
+  amzActual:   4412609,
+  amzOOC:      0,
+
+  // Wholesale: "Sales Summary by Customer and SKU" (invoiced) + "KJ - Sales Actuals vs Forecast OOC"
+  // All Level 5 channels per the June tab structure
+  // Source: June 2026 actuals vs forecast report (June 1–8)
+  wsChannels: [
+    { name: 'Ulta Inc.',               actual: 444910,  ooc: 815729,  fc: 3281200 },
+    { name: 'Target',                  actual: 917417,  ooc: 1828645, fc: 4521640 },
+    { name: 'Faire',                   actual: 233138,  ooc: 98161,   fc: 975637  },
+    { name: 'CVS Health',              actual: 89459,   ooc: 43249,   fc: 181000  },
+    { name: 'Walgreens',               actual: 801453,  ooc: 28032,   fc: 230000  },
+    { name: 'Walmart',                 actual: 126096,  ooc: 45439,   fc: 315200  },
+    { name: 'Whole Foods/Sprouts',     actual: 0,       ooc: 0,       fc: 163000  },
+    { name: "Kohl's Inc.",             actual: 103884,  ooc: 0,       fc: 66950   },
+    { name: 'Meijer',                  actual: 67728,   ooc: 64336,   fc: 61538   },
+    { name: 'Boots UK Ltd.',           actual: 164853,  ooc: 29318,   fc: 95000   },
+    { name: 'HEB',                     actual: 84885,   ooc: 129263,  fc: 162869  },
+    { name: 'KROGER',                  actual: 0,       ooc: 272433,  fc: 289000  },
+    { name: 'Nordstrom Rack/Hautelook',actual: 143927,  ooc: 736621,  fc: 394000  },
+    { name: 'Scheels',                 actual: 33369,   ooc: 30180,   fc: 105000  },
+    { name: 'Off-Price',               actual: 287147,  ooc: 811387,  fc: 900000  },
+    { name: 'Business Development',    actual: 0,       ooc: 0,       fc: 103020  },
+    { name: 'Grocery',                 actual: 14654,   ooc: 76681,   fc: 232100  },
+    { name: 'Specialty',               actual: 3038,    ooc: 29831,   fc: 224979  },
+    { name: 'International',           actual: 65594,   ooc: 8287,    fc: 150150  },
+    { name: 'Other - Misc',            actual: 142757,  ooc: 57211,   fc: 328900  },
+  ],
+
+  // ── Forecasts (June 2026 — from June tab) ──
+  dtcFC:     14552848,
+  amzFC:     13768064,
+  wsFC:      12781183,  // Sum of wsChannels[*].fc · Total FC = $41,102,095
+
+  // ── LY same period: June 1–8, 2025 (pro-rated June 2025 ÷ 30 × 8)
+  // Source: NS - 12 Kitsch Per SKU Analysis Report Dec 2025 (Key Customer tab)
+  dtcLY:     2583615,   // $9,688,555 Jun 2025 × 8/30
+  amzLY:     2993854,   // $11,226,952 Jun 2025 × 8/30
+  wsLY:      2549087,   // $9,559,078 Jun 2025 × 8/30
+};
+
+// ── Derived totals (auto-calculated, do not edit) ────────
+DATA.wsActual  = DATA.wsChannels.reduce((s,c) => s + c.actual, 0);
+DATA.wsOOC     = DATA.wsChannels.reduce((s,c) => s + c.ooc,    0);
+DATA.wsMTD     = DATA.wsActual + DATA.wsOOC;
+DATA.dtcMTD    = DATA.dtcActual + DATA.dtcOOC;
+DATA.amzMTD    = DATA.amzActual + DATA.amzOOC;
+DATA.totalActual = DATA.dtcActual + DATA.amzActual + DATA.wsActual;
+DATA.totalOOC    = DATA.dtcOOC   + DATA.amzOOC   + DATA.wsOOC;
+DATA.totalMTD    = DATA.totalActual + DATA.totalOOC;
+DATA.totalFC     = DATA.dtcFC + DATA.amzFC + DATA.wsFC;
+DATA.daysInMonth = new Date(DATA.dataYear, DATA.dataMonth + 1, 0).getDate();
+DATA.totalLY     = DATA.dtcLY + DATA.amzLY + DATA.wsLY;
+</script>
+
+<div class="header">
+  <div class="header-left">
+    <div>
+      <div class="header-logo">Kitsch</div>
+      <div class="header-sub">Sales Command Center</div>
+    </div>
+    <div class="header-divider"></div>
+    <div class="header-title" id="hdr-title">Sales vs Forecast</div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge"><div class="live-dot"></div>Live</div>
+    <div class="data-stamp">
+      <span class="viewing" id="hdr-viewing"></span>
+      <span class="asof"   id="hdr-asof"></span>
+    </div>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="showTab('overview',this)">Overview</div>
+  <div class="nav-tab" onclick="showTab('monthly',this)">Monthly</div>
+  <div class="nav-tab" onclick="showTab('ytd',this)">YTD</div>
+  <div class="nav-tab" onclick="showTab('yoy',this)">Year-over-Year</div>
+</div>
+
+<div class="main">
+
+  <!-- ═══════ OVERVIEW ═══════ -->
+  <div id="tab-overview" class="tab-content active">
+
+    <!-- Command Brief -->
+    <div class="command-brief">
+      <div class="brief-label" id="brief-label">⚡ Command Brief</div>
+      <!-- Top row: TOTAL headline -->
+      <div style="margin-bottom:12px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.15em;color:var(--accent-muted);margin-bottom:6px">TOTAL</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div class="norm-badge">
+            <div class="norm-badge-label">Today's Norm</div>
+            <div class="norm-badge-val big muted" id="norm-pct-display">—</div>
+          </div>
+          <div class="norm-arrow">→</div>
+          <div class="norm-badge">
+            <div class="norm-badge-label">Total ACH</div>
+            <div class="norm-badge-val big ahead" id="ach-pct-display">—</div>
+          </div>
+          <span class="norm-tag" id="norm-gap-tag">—</span>
+          <div style="flex:1"></div>
+          <div class="norm-badge" style="border:1px solid rgba(255,255,255,.15)">
+            <div class="norm-badge-label">MTD TOTAL</div>
+            <div class="norm-badge-val big neutral" id="mtd-total-display">—</div>
+          </div>
+          <div class="norm-badge">
+            <div class="norm-badge-label" id="fc-month-label">Month FC</div>
+            <div class="norm-badge-val muted" id="fc-total-display">—</div>
+          </div>
+          <div class="norm-badge">
+            <div class="norm-badge-label">LY Same Period</div>
+            <div class="norm-badge-val muted" id="ly-display">—</div>
+          </div>
+          <div class="norm-badge" style="border-left:2px solid #6dbf85">
+            <div class="norm-badge-label">YoY Growth</div>
+            <div class="norm-badge-val ahead" id="yoy-display">—</div>
+          </div>
+        </div>
+      </div>
+      <!-- Channel MTD row: DTC · AMAZON · WHOLESALE -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+        <div style="background:rgba(139,123,181,0.18);border-radius:8px;padding:16px 18px;border-left:4px solid #8b7bb5">
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#c4b8e8;margin-bottom:6px">DTC &nbsp;<span style="font-weight:400;opacity:.6;font-size:10px">MTD</span></div>
+          <div style="font-size:28px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;line-height:1" id="dtc-brief-val">—</div>
+          <div style="font-size:12px;color:#aaa;margin-top:6px;font-variant-numeric:tabular-nums" id="dtc-brief-sub">—</div>
+        </div>
+        <div style="background:rgba(196,154,43,0.18);border-radius:8px;padding:16px 18px;border-left:4px solid #c49a2b">
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#e8d190;margin-bottom:6px">AMAZON &nbsp;<span style="font-weight:400;opacity:.6;font-size:10px">MTD</span></div>
+          <div style="font-size:28px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;line-height:1" id="amz-brief-val">—</div>
+          <div style="font-size:12px;color:#aaa;margin-top:6px;font-variant-numeric:tabular-nums" id="amz-brief-sub">—</div>
+        </div>
+        <div style="background:rgba(74,124,89,0.18);border-radius:8px;padding:16px 18px;border-left:4px solid #4a7c59">
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#8ed4a4;margin-bottom:6px">WHOLESALE &nbsp;<span style="font-weight:400;opacity:.6;font-size:10px">MTD</span></div>
+          <div style="font-size:28px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;line-height:1" id="ws-brief-val">—</div>
+          <div style="font-size:12px;color:#aaa;margin-top:6px;font-variant-numeric:tabular-nums" id="ws-brief-sub">—</div>
+        </div>
+      </div>
+      <div class="brief-leader" id="brief-leader-text">—</div>
+      <!-- Sprint Tracker -->
+      <div class="sprint-header">🏃 Sprint to Close <span class="sprint-ctx" id="sprint-ctx"></span></div>
+      <div class="sprint-row" id="sprint-row"></div>
+    </div>
+
+    <!-- Channel Performance Cards -->
+    <div class="section-header">
+      <div class="section-title" id="ch-section-title">Channel Performance</div>
+      <div class="section-meta" id="ch-meta">—</div>
+    </div>
+    <div class="channel-grid">
+
+      <!-- DTC -->
+      <div class="channel-card">
+        <div class="ch-top dtc">
+          <div class="ch-header">
+            <div class="ch-name">Kitsch DTC</div>
+            <div class="ch-badges">
+              <span class="ch-badge" id="dtc-ach-badge">—</span>
+              <span class="ch-badge blue" id="dtc-yoy-badge">—</span>
+            </div>
+          </div>
+          <div class="ch-actual" id="dtc-actual-display">—</div>
+          <div class="ch-fc-row">
+            <div class="ch-fc-label" id="dtc-fc-label">—</div>
+            <div class="ch-delta" id="dtc-delta">—</div>
+          </div>
+          <div class="ch-yoy-row">
+            <div>
+              <div class="ch-yoy-label">LY Same Period</div>
+              <div class="ch-yoy-ly" id="dtc-ly-label">—</div>
+            </div>
+            <div class="ch-yoy-val up" id="dtc-yoy-val">—</div>
+          </div>
+          <div class="ch-norm-wrap">
+            <div class="ch-norm-labels">
+              <span class="ch-norm-ach" style="color:var(--purple)" id="dtc-norm-ach">—</span>
+              <span class="ch-norm-norm" id="dtc-norm-label">Norm —</span>
+            </div>
+            <div class="prog-track">
+              <div class="prog-fill" id="dtc-prog" style="background:var(--purple);width:0%"></div>
+              <div class="norm-mk" id="dtc-norm-mk" style="left:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ch-events">
+          <div class="ev-label">June Promotions & Launches</div>
+          <div class="ev-line"><div class="ev-date">6/2–6/4</div><div class="ev-desc">40% Off — Celebrate Your Curls / Curling Campaign</div></div>
+          <div class="ev-line"><div class="ev-date">6/5</div><div class="ev-desc">Summer Box launch — DTC + Amazon</div></div>
+          <div class="ev-line"><div class="ev-date">6/9</div><div class="ev-desc">24-Hr Flash Sale — BOGO 60% Off All Bars</div></div>
+          <div class="ev-line"><div class="ev-date">6/11–6/16</div><div class="ev-desc">Extra 10% off select bundles (3+ items) with code</div></div>
+          <div class="ev-line"><div class="ev-date">6/12–6/14</div><div class="ev-desc">GWP $35+: Hair Perfume Sampler</div></div>
+          <div class="ev-line"><div class="ev-date">6/17–7/4</div><div class="ev-desc">TikTok Summer BF / Super Brand Day</div></div>
+          <div class="ev-line"><div class="ev-date">6/18–7/6</div><div class="ev-desc">Summer Black Friday — 30% Off Sitewide</div></div>
+        </div>
+      </div>
+
+      <!-- Amazon -->
+      <div class="channel-card">
+        <div class="ch-top amazon">
+          <div class="ch-header">
+            <div class="ch-name">Amazon</div>
+            <div class="ch-badges">
+              <span class="ch-badge" id="amz-ach-badge">—</span>
+              <span class="ch-badge blue" id="amz-yoy-badge">—</span>
+            </div>
+          </div>
+          <div class="ch-actual" id="amz-actual-display">—</div>
+          <div class="ch-fc-row">
+            <div class="ch-fc-label" id="amz-fc-label">—</div>
+            <div class="ch-delta" id="amz-delta">—</div>
+          </div>
+          <div class="ch-yoy-row">
+            <div>
+              <div class="ch-yoy-label">LY Same Period</div>
+              <div class="ch-yoy-ly" id="amz-ly-label">—</div>
+            </div>
+            <div class="ch-yoy-val up" id="amz-yoy-val">—</div>
+          </div>
+          <div class="ch-norm-wrap">
+            <div class="ch-norm-labels">
+              <span class="ch-norm-ach" style="color:var(--yellow)" id="amz-norm-ach">—</span>
+              <span class="ch-norm-norm" id="amz-norm-label">Norm —</span>
+            </div>
+            <div class="prog-track">
+              <div class="prog-fill" id="amz-prog" style="background:var(--yellow);width:0%"></div>
+              <div class="norm-mk" id="amz-norm-mk" style="left:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ch-events">
+          <div class="ev-label">June Events</div>
+          <div class="ev-line"><div class="ev-date">6/5</div><div class="ev-desc">Summer Box launch on Amazon</div></div>
+          <div class="ev-line"><div class="ev-date">6/9</div><div class="ev-desc">BOGO 60% Off All Bars — 24-hour flash sale</div></div>
+          <div class="ev-line"><div class="ev-date">6/11–6/16</div><div class="ev-desc">Extra 10% off select bundles (3+ items) with code</div></div>
+          <div class="ev-line"><div class="ev-date">6/17–7/4</div><div class="ev-desc">TikTok Summer Black Friday / Super Brand Day</div></div>
+          <div class="ev-line"><div class="ev-date">6/18–7/6</div><div class="ev-desc">Summer Black Friday — 30% Off Sitewide support</div></div>
+        </div>
+      </div>
+
+      <!-- Wholesale -->
+      <div class="channel-card">
+        <div class="ch-top wholesale">
+          <div class="ch-header">
+            <div class="ch-name">Wholesale</div>
+            <div class="ch-badges">
+              <span class="ch-badge" id="ws-ach-badge">—</span>
+              <span class="ch-badge blue" id="ws-yoy-badge">—</span>
+            </div>
+          </div>
+          <div class="ch-actual" id="ws-actual-display">—</div>
+          <div class="ch-fc-row">
+            <div class="ch-fc-label" id="ws-fc-label">—</div>
+            <div class="ch-delta" id="ws-delta">—</div>
+          </div>
+          <div class="ch-yoy-row">
+            <div>
+              <div class="ch-yoy-label">LY Same Period</div>
+              <div class="ch-yoy-ly" id="ws-ly-label">—</div>
+            </div>
+            <div class="ch-yoy-val up" id="ws-yoy-val">—</div>
+          </div>
+          <div class="ch-norm-wrap">
+            <div class="ch-norm-labels">
+              <span class="ch-norm-ach" style="color:var(--green)" id="ws-norm-ach">—</span>
+              <span class="ch-norm-norm" id="ws-norm-label">Norm —</span>
+            </div>
+            <div class="prog-track">
+              <div class="prog-fill" id="ws-prog" style="background:var(--green);width:0%"></div>
+              <div class="norm-mk" id="ws-norm-mk" style="left:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ch-events">
+          <div class="ev-label">June Wholesale Events</div>
+          <div class="ev-line"><div class="ev-date">6/1</div><div class="ev-desc">Walgreens June Reset + Door Expansion (new items)</div></div>
+          <div class="ev-line"><div class="ev-date">6/1</div><div class="ev-desc">Grocery channel new item ship-in</div></div>
+          <div class="ev-line"><div class="ev-date">6/5</div><div class="ev-desc">HEB Back to School Display — new item ship-in</div></div>
+          <div class="ev-line"><div class="ev-date">6/14</div><div class="ev-desc">Ulta Wk 27 Back-to-College Etagere (secondary event)</div></div>
+          <div class="ev-line"><div class="ev-date">6/17</div><div class="ev-desc">HEB One-Time Ship + Kroger Hair Care Reset</div></div>
+          <div class="ev-line"><div class="ev-date">6/28</div><div class="ev-desc">Target Gratis · Sephora SEA One-Time Ship</div></div>
+        </div>
+      </div>
+
+    </div><!-- /channel-grid -->
+
+    <!-- Channel detail moved to Monthly tab — select a month there to see Level 5 breakdown -->
+
+  </div><!-- /overview -->
+
+  <!-- ═══════ MONTHLY ═══════ -->
+  <div id="tab-monthly" class="tab-content">
+
+    <!-- Month selector -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:var(--taupe);font-weight:600">View Month:</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="month-pills"></div>
+      <div style="margin-left:auto;font-size:11px;color:var(--taupe)" id="month-meta-label">—</div>
+    </div>
+
+    <!-- Month summary KPIs -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px" id="month-kpi-row"></div>
+
+    <!-- Level 5 detail table -->
+    <div class="table-card" style="margin-bottom:18px">
+      <div class="table-card-header">
+        <div class="section-title" style="font-size:14px" id="month-table-title">Channel Detail</div>
+        <div class="section-meta" id="month-table-meta">All Level 5 channels</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Channel / Level 5</th>
+            <th class="r">Actuals</th>
+            <th class="r">OOC</th>
+            <th class="r">MTD Total</th>
+            <th class="r">Forecast</th>
+            <th class="r">ACH %</th>
+            <th class="r">Norm %</th>
+            <th class="r">Over / (Short) vs Norm</th>
+            <th class="r">Balance to FC</th>
+          </tr>
+        </thead>
+        <tbody id="month-detail-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Monthly trend chart -->
+    <div class="chart-card">
+      <div class="section-header" style="margin-bottom:12px">
+        <div class="section-title" style="font-size:14px">Monthly Total — Actuals vs Forecast vs LY</div>
+      </div>
+      <div style="position:relative;height:280px"><canvas id="monthlyDetailChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ═══════ YTD ═══════ -->
+  <div id="tab-ytd" class="tab-content">
+    <div class="section-header" style="margin-bottom:14px">
+      <div class="section-title">YTD Achievement — Jan 1 to May 26, 2026</div>
+      <div class="section-meta">vs Forecast (YTD tab col AG) · vs LY</div>
+    </div>
+    <div class="ytd-grid">
+      <!-- YTD figures: Jan–May 2026 full year (May now closed). LY from NS SKU Report 2025. -->
+      <div class="ytd-card" style="border-top-color:var(--accent)">
+        <div class="ytd-lbl">Total YTD (Jan–May)</div><div class="ytd-val">$193.1M</div>
+        <div class="ytd-fc">vs $167.4M forecast</div>
+        <div class="ytd-ach" style="color:var(--green)">115% ACH</div>
+        <div class="ytd-delta" style="color:var(--green)">+$25.7M ahead</div>
+        <div class="ytd-yoy">LY YTD: $152.1M &nbsp;<span>+27% YoY</span></div>
+      </div>
+      <div class="ytd-card" style="border-top-color:var(--purple)">
+        <div class="ytd-lbl">Kitsch DTC</div><div class="ytd-val">$59.6M</div>
+        <div class="ytd-fc">vs $57.0M forecast</div>
+        <div class="ytd-ach" style="color:var(--green)">105% ACH</div>
+        <div class="ytd-delta" style="color:var(--green)">+$2.6M ahead</div>
+        <div class="ytd-yoy">LY YTD: $51.5M &nbsp;<span>+16% YoY</span></div>
+      </div>
+      <div class="ytd-card" style="border-top-color:var(--yellow)">
+        <div class="ytd-lbl">Amazon</div><div class="ytd-val">$73.6M</div>
+        <div class="ytd-fc">vs $57.6M forecast</div>
+        <div class="ytd-ach" style="color:var(--green)">128% ACH</div>
+        <div class="ytd-delta" style="color:var(--green)">+$16.0M ahead</div>
+        <div class="ytd-yoy">LY YTD: $55.6M &nbsp;<span>+32% YoY</span></div>
+      </div>
+      <div class="ytd-card" style="border-top-color:var(--green)">
+        <div class="ytd-lbl">Wholesale</div><div class="ytd-val">$59.9M</div>
+        <div class="ytd-fc">vs $52.8M forecast</div>
+        <div class="ytd-ach" style="color:var(--green)">113% ACH</div>
+        <div class="ytd-delta" style="color:var(--green)">+$7.1M ahead</div>
+        <div class="ytd-yoy">LY YTD: $45.0M &nbsp;<span>+33% YoY</span></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="section-header" style="margin-bottom:12px">
+        <div class="section-title" style="font-size:14px">YTD Actuals vs Forecast vs LY</div>
+      </div>
+      <div style="position:relative;height:300px"><canvas id="ytdChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ═══════ YOY ═══════ -->
+  <div id="tab-yoy" class="tab-content">
+    <div class="section-header" style="margin-bottom:14px">
+      <div class="section-title">Year-over-Year Comparison</div>
+      <div class="section-meta">Same MTD period — LY vs Current Year</div>
+    </div>
+    <!-- YoY KPIs: June 2026 MTD Day 4 vs June 2025 Day 4 est. (pro-rated from NS SKU Report) -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;" id="yoy-kpis"></div>
+    <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:18px;">
+      <div class="chart-card" style="margin-bottom:0">
+        <div class="section-header" style="margin-bottom:10px"><div class="section-title" style="font-size:14px">MTD by Channel — LY vs CY</div></div>
+        <div style="position:relative;height:260px"><canvas id="yoyBarChart"></canvas></div>
+      </div>
+      <div class="chart-card" style="margin-bottom:0">
+        <div class="section-header" style="margin-bottom:10px"><div class="section-title" style="font-size:14px">Monthly YoY Growth %</div></div>
+        <div style="position:relative;height:260px"><canvas id="yoyGrowthChart"></canvas></div>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-card-header"><div class="section-title" style="font-size:14px">Monthly YoY — All Channels</div></div>
+      <table>
+        <thead><tr><th>Month</th><th class="r">2025 Total</th><th class="r">2026 Total</th><th class="r">$ Growth</th><th class="r">% Growth</th><th class="r">DTC YoY</th><th class="r">Amazon YoY</th><th class="r">Wholesale YoY</th></tr></thead>
+        <tbody>
+          <!-- 2025 data: NS - 12 Kitsch Per SKU Analysis Report Dec 2025 (Key Customer tab) -->
+          <tr><td>January</td><td class="r num">$31.8M</td><td class="r num">$48.5M</td><td class="r num" style="color:var(--green)">+$16.7M</td><td class="r"><span class="badge green">+53%</span></td><td class="r num" style="color:var(--green)">+42%</td><td class="r num" style="color:var(--green)">+46%</td><td class="r num" style="color:var(--green)">+71%</td></tr>
+          <tr><td>February</td><td class="r num">$26.6M</td><td class="r num">$44.1M</td><td class="r num" style="color:var(--green)">+$17.5M</td><td class="r"><span class="badge green">+66%</span></td><td class="r num" style="color:var(--green)">+40%</td><td class="r num" style="color:var(--green)">+86%</td><td class="r num" style="color:var(--green)">+76%</td></tr>
+          <tr><td>March</td><td class="r num">$29.9M</td><td class="r num">$51.6M</td><td class="r num" style="color:var(--green)">+$21.7M</td><td class="r"><span class="badge green">+73%</span></td><td class="r num" style="color:var(--green)">+41%</td><td class="r num" style="color:var(--green)">+65%</td><td class="r num" style="color:var(--green)">+128%</td></tr>
+          <tr><td>April</td><td class="r num">$31.3M</td><td class="r num">$43.1M</td><td class="r num" style="color:var(--green)">+$11.8M</td><td class="r"><span class="badge green">+38%</span></td><td class="r num" style="color:var(--green)">+47%</td><td class="r num" style="color:var(--green)">+39%</td><td class="r num" style="color:var(--green)">+28%</td></tr>
+          <tr><td>May (Full Month)</td><td class="r num">$32.6M</td><td class="r num">$48.2M</td><td class="r num" style="color:var(--green)">+$15.6M</td><td class="r"><span class="badge green">+48%</span></td><td class="r num" style="color:var(--green)">+42%</td><td class="r num" style="color:var(--green)">+65%</td><td class="r num" style="color:var(--green)">+34%</td></tr>
+          <tr class="total-row"><td>YTD (Jan–May)</td><td class="r num">$152.1M</td><td class="r num">$235.5M</td><td class="r num" style="color:var(--green)">+$83.4M</td><td class="r"><span class="badge green">+55%</span></td><td class="r num" style="color:var(--green)">+16%</td><td class="r num" style="color:var(--green)">+32%</td><td class="r num" style="color:var(--green)">+33%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="footer" id="footer-stamp">
+  Kitsch Sales Command Center · Sources: NetSuite (Wholesale actuals + OOC) · Shopify (DTC) · Amazon Seller Central · Forecast: YTD tab col AG
+</div>
+
+<script>
+// ─── HELPERS ──────────────────────────────────────────────────────
+function showTab(name,el){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+// Full dollar amounts — no abbreviations
+function fmtFull(n){ return '$'+Math.round(Math.abs(n)).toLocaleString('en-US'); }
+function fmtM(n){ return fmtFull(n); }   // keep fmtM alias for legacy calls
+function fmtK(n){ return fmtFull(n); }   // keep fmtK alias for legacy calls
+function fmtDollar(n){ return (n<0?'-':'+')+fmtFull(n); }
+function pct(n){ return Math.round(n*100)+'%'; }
+function achColor(ach, norm){
+  if(ach >= 1.0)  return 'green';
+  if(ach >= norm) return 'yellow';
+  return 'red';
+}
+
+// ─── DATE LOGIC (always California / Pacific time = NetSuite time) ──────────
+// This ensures Glenn in Philippines sees June 4 when it's still June 4 in CA
+const _now        = new Date();
+const _caStr      = _now.toLocaleString('en-US', {timeZone: 'America/Los_Angeles'});
+const today       = new Date(_caStr);
+const todayDay    = today.getDate();
+const todayMonth  = today.getMonth();
+const todayYear   = today.getFullYear();
+
+const isSameMonth  = todayMonth === DATA.dataMonth && todayYear === DATA.dataYear;
+const isAfterMonth = todayYear > DATA.dataYear || (todayYear === DATA.dataYear && todayMonth > DATA.dataMonth);
+
+// Norm is based on TODAY's position in the reporting month
+// (so it updates every day the user opens the dashboard)
+const viewingDay   = isSameMonth ? todayDay : DATA.daysInMonth;
+const normFrac     = viewingDay / DATA.daysInMonth;   // e.g. 26/31 = 0.8387
+const normPct      = normFrac;
+
+// Days remaining from TODAY (not from data date)
+const daysRemaining = Math.max(0, DATA.daysInMonth - viewingDay);
+
+// Month label
+const monthName = MONTHS[DATA.dataMonth];
+const reportingLabel = monthName + ' ' + DATA.dataYear;
+
+// ─── HEADER ──────────────────────────────────────────────────────
+document.getElementById('hdr-title').textContent = reportingLabel + ' Sales vs Forecast';
+document.getElementById('hdr-viewing').textContent =
+  'California: '+today.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'America/Los_Angeles'})+
+  ' '+_now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',timeZone:'America/Los_Angeles'})+' PT';
+document.getElementById('hdr-asof').textContent =
+  'Data as of: '+monthName+' '+DATA.asOfDay+', '+DATA.dataYear+' (PT)';
+
+// ─── COMMAND BRIEF ────────────────────────────────────────────────
+document.getElementById('brief-label').textContent =
+  '⚡ Command Brief — '+reportingLabel+' · Viewing Day '+viewingDay+' of '+DATA.daysInMonth;
+
+const totalACH  = DATA.totalMTD / DATA.totalFC;
+const achPctInt = Math.round(totalACH * 100);
+const normPctInt= Math.round(normPct * 100);
+const gapPt     = achPctInt - normPctInt;
+
+document.getElementById('norm-pct-display').textContent  = normPctInt+'%';
+document.getElementById('ach-pct-display').textContent   = achPctInt+'%';
+document.getElementById('mtd-total-display').textContent = fmtFull(DATA.totalMTD);
+document.getElementById('fc-month-label').textContent    = monthName+' FC';
+document.getElementById('fc-total-display').textContent  = fmtFull(DATA.totalFC);
+document.getElementById('ly-display').textContent        = fmtFull(DATA.totalLY);
+const yoyPct = Math.round((DATA.totalMTD - DATA.totalLY) / DATA.totalLY * 100);
+document.getElementById('yoy-display').textContent = (yoyPct>=0?'+':'')+yoyPct+'%';
+
+// Channel summary in brief
+function briefSub(mtd, fc, normFr) {
+  const ach = fc > 0 ? Math.round(mtd/fc*100) : 0;
+  const norm = Math.round(normFr*100);
+  const gap = ach - norm;
+  return ach+'% ACH · '+(gap>=0?'+':'')+gap+'pt vs norm';
+}
+document.getElementById('dtc-brief-val').textContent = fmtFull(DATA.dtcMTD);
+document.getElementById('dtc-brief-sub').textContent = briefSub(DATA.dtcMTD, DATA.dtcFC, normPct);
+document.getElementById('amz-brief-val').textContent = fmtFull(DATA.amzMTD);
+document.getElementById('amz-brief-sub').textContent = briefSub(DATA.amzMTD, DATA.amzFC, normPct);
+document.getElementById('ws-brief-val').textContent  = fmtFull(DATA.wsMTD);
+document.getElementById('ws-brief-sub').textContent  = briefSub(DATA.wsMTD, DATA.wsFC, normPct);
+
+const tag = document.getElementById('norm-gap-tag');
+tag.textContent = (gapPt>=0?'+':'')+gapPt+'pt vs norm';
+tag.className   = 'norm-tag '+(gapPt>=0?'ahead':'behind');
+
+document.getElementById('ch-section-title').textContent = reportingLabel+' Channel Performance';
+document.getElementById('ch-meta').textContent =
+  'Data as of '+monthName+' '+DATA.asOfDay+' · Today\'s norm: '+normPctInt+'%';
+// (Channel detail table removed from Overview — lives in Monthly tab)
+
+// ─── SPRINT TRACKER ───────────────────────────────────────────────
+const sprintCtx = document.getElementById('sprint-ctx');
+const sprintRow = document.getElementById('sprint-row');
+
+function renderSprint(cls, label, actual, ooc, mtd, fc, normFr, daysLeft, daysInMo, asOfD){
+  const ach        = mtd / fc;
+  const balance    = fc - mtd;
+  const dailyRate  = actual / asOfD;                    // run rate from data date
+  const projClose  = actual + dailyRate*(daysInMo - asOfD); // extrapolated to month end
+  const exceeded   = mtd >= fc;
+  const projOver   = projClose >= fc;
+  const dailyNeeded = daysLeft > 0 ? Math.max(0, balance) / daysLeft : 0;
+
+  const lblClass = cls.replace('s-','');
+  if(exceeded){
+    return `<div class="sprint-box ${cls}">
+      <div class="sprint-lbl ${lblClass}">${label}</div>
+      <div class="sprint-days"><strong>${daysLeft}d left</strong> · Data as of Day ${asOfD}</div>
+      <div class="sprint-val good">✓ Plan Exceeded</div>
+      <div class="sprint-sub">${fmtFull(mtd-fc)} above plan</div>
+      <div class="sprint-proj over">↑ Proj. close: ${fmtFull(projClose)}</div>
+    </div>`;
+  } else if(daysLeft === 0){
+    return `<div class="sprint-box ${cls}">
+      <div class="sprint-lbl ${lblClass}">${label} · Last Day</div>
+      <div class="sprint-days">Balance needed: ${fmtFull(balance)}</div>
+      <div class="sprint-val warn">${fmtFull(balance)}</div>
+      <div class="sprint-sub">needed today to hit plan</div>
+      <div class="sprint-proj ${projOver?'over':'under'}">${projOver?'↑':'↓'} Proj. close: ${fmtFull(projClose)}</div>
+    </div>`;
+  } else {
+    return `<div class="sprint-box ${cls}">
+      <div class="sprint-lbl ${lblClass}">${label}</div>
+      <div class="sprint-days"><strong>${daysLeft}d left</strong> · Data as of Day ${asOfD}</div>
+      <div class="sprint-val">${fmtFull(balance)}</div>
+      <div class="sprint-sub">to plan · ${fmtFull(dailyNeeded)}/day needed</div>
+      <div class="sprint-proj ${projOver?'over':'under'}">${projOver?'↑':'↓'} Proj. close: ${fmtFull(projClose)}</div>
+    </div>`;
+  }
+}
+
+if(isAfterMonth){
+  sprintCtx.textContent = reportingLabel+' is closed.';
+  sprintRow.innerHTML = `<div class="sprint-box s-total" style="grid-column:span 4;text-align:center;padding:16px">
+    <div class="sprint-lbl">${reportingLabel} Final</div>
+    <div class="sprint-closed">Month closed · Final actuals pending NetSuite month-end close</div>
+    <div class="sprint-sub" style="margin-top:5px">Last data snapshot: ${monthName} ${DATA.asOfDay} · ${fmtM(DATA.totalActual)} captured</div>
+  </div>`;
+} else {
+  sprintCtx.textContent = daysRemaining === 0
+    ? 'Today is the last day of '+monthName+' — final push!'
+    : daysRemaining+'d remaining in '+monthName+' · data as of Day '+DATA.asOfDay;
+
+  sprintRow.innerHTML =
+    renderSprint('s-total','Total',   DATA.totalActual,DATA.totalOOC,DATA.totalMTD,DATA.totalFC,normPct,daysRemaining,DATA.daysInMonth,DATA.asOfDay)+
+    renderSprint('s-dtc',  'DTC',     DATA.dtcActual,  DATA.dtcOOC,  DATA.dtcMTD,  DATA.dtcFC,  normPct,daysRemaining,DATA.daysInMonth,DATA.asOfDay)+
+    renderSprint('s-amz',  'Amazon',  DATA.amzActual,  DATA.amzOOC,  DATA.amzMTD,  DATA.amzFC,  normPct,daysRemaining,DATA.daysInMonth,DATA.asOfDay)+
+    renderSprint('s-ws',   'Wholesale',DATA.wsActual,  DATA.wsOOC,   DATA.wsMTD,   DATA.wsFC,   normPct,daysRemaining,DATA.daysInMonth,DATA.asOfDay);
+}
+
+// ─── CHANNEL CARDS ────────────────────────────────────────────────
+function renderCard(prefix, actual, ooc, mtd, fc, ly, color){
+  const ach      = mtd / fc;
+  const achInt   = Math.round(ach*100);
+  const balance  = fc - mtd;
+  const achCol   = achColor(ach, normPct);
+  const yoyAmt   = mtd - ly;
+  const yoyP     = Math.round(yoyAmt/ly*100);
+  const normPctStr = normPctInt+'%';
+
+  document.getElementById(prefix+'-actual-display').textContent = fmtM(mtd);
+  document.getElementById(prefix+'-fc-label').textContent       = 'vs '+fmtM(fc)+' forecast'+(ooc>0?' (incl. OOC)':'');
+  const deltaEl = document.getElementById(prefix+'-delta');
+  deltaEl.textContent = (balance<=0?'+':'-')+fmtK(Math.abs(balance))+' vs plan';
+  deltaEl.className = 'ch-delta '+(balance<=0?'pos':'neg');
+
+  const badge = document.getElementById(prefix+'-ach-badge');
+  badge.textContent = achInt+'% ACH'+(ach>=1?' ✓':'');
+  badge.className   = 'ch-badge '+achCol;
+
+  document.getElementById(prefix+'-yoy-badge').textContent = (yoyP>=0?'+':'')+yoyP+'% YoY';
+  document.getElementById(prefix+'-ly-label').textContent  = fmtM(ly)+' actual';
+  document.getElementById(prefix+'-yoy-val').textContent   = (yoyAmt>=0?'+':'')+fmtK(yoyAmt)+' '+(yoyP>=0?'+':'')+yoyP+'%';
+  document.getElementById(prefix+'-norm-ach').textContent  = achInt+'% ACH'+(ach>=1?' — Exceeded':'');
+  document.getElementById(prefix+'-norm-label').textContent= "Today's Norm "+normPctStr;
+
+  const progWidth = Math.min(ach*100, 100);
+  document.getElementById(prefix+'-prog').style.width = progWidth+'%';
+  document.getElementById(prefix+'-norm-mk').style.left = normPctInt+'%';
+}
+
+renderCard('dtc', DATA.dtcActual, DATA.dtcOOC, DATA.dtcMTD, DATA.dtcFC, DATA.dtcLY, 'purple');
+renderCard('amz', DATA.amzActual, DATA.amzOOC, DATA.amzMTD, DATA.amzFC, DATA.amzLY, 'yellow');
+renderCard('ws',  DATA.wsActual,  DATA.wsOOC,  DATA.wsMTD,  DATA.wsFC,  DATA.wsLY,  'green');
+
+// ─── DETAIL TABLE (mirrors Excel "June" tab layout) ──────────────
+const wsDrivers = {
+  'Target':                   'Coastal Cottage Endcap + July Haircare Transition ship-in',
+  'Ulta Inc.':                'Wk 27 Back-to-College Etagere',
+  'Off-Price':                'TJX Q2 Production flowing — June & July',
+  'Faire':                    'Steady wholesale momentum',
+  'Walgreens':                'June Reset & Door Expansion',
+  'Walmart':                  'Replenishment recovery',
+  'Whole Foods/Sprouts':      'Seasonal replenishment',
+  "Kohl's Inc.":              'Seasonal transition',
+  'Meijer':                   'Steady replenishment',
+  'Boots UK Ltd.':            'International — pending next ship window',
+  'HEB':                      'Back to School Display upcoming',
+  'KROGER':                   'Hair Care Reset 2026',
+  'Nordstrom Rack/Hautelook': 'Tracking to plan',
+  'Scheels':                  'Seasonal replenishment',
+  'Business Development':     '—',
+  'Grocery':                  'Steady replenishment',
+  'Specialty':                'Seasonal mix',
+  'International':            'Pending next cycle',
+  'CVS Health':               'Steady replenishment',
+  'Other - Misc':             'Various specialty channels',
+};
+
+function buildRow(name, actual, ooc, fc, norm, isTotal=false){
+  const mtd       = actual + ooc;
+  const ach       = fc > 0 ? mtd / fc : 0;
+  const achInt    = Math.round(ach * 100);
+  const normInt   = Math.round(norm * 100);
+  const overShort = (ach - norm) * fc;
+  const balance   = fc - mtd;
+  const achCol    = achColor(ach, norm);
+  const trCls     = isTotal ? 'class="total-row"' : '';
+  const oocDisplay = ooc > 0
+    ? `<span style="color:var(--blue);font-weight:600">${fmtK(ooc)}</span>`
+    : `<span style="color:var(--taupe)">—</span>`;
+  const overShortDisplay = overShort >= 0
+    ? `<span style="color:var(--green);font-weight:600">+${fmtK(overShort)}</span>`
+    : `<span style="color:var(--red);">(${fmtK(Math.abs(overShort))})</span>`;
+  const balanceDisplay = balance <= 0
+    ? `<span style="color:var(--green);font-weight:600">EXCEEDED</span>`
+    : `<span style="color:var(--red);">-${fmtK(balance)}</span>`;
+
+  return `<tr ${trCls}>
+    <td>${name}</td>
+    <td class="r num">${actual > 0 ? fmtK(actual) : '<span style="color:var(--taupe)">—</span>'}</td>
+    <td class="r num">${oocDisplay}</td>
+    <td class="r num"><strong>${mtd > 0 ? fmtK(mtd) : '<span style="color:var(--taupe)">—</span>'}</strong></td>
+    <td class="r num">${fmtK(fc)}</td>
+    <td class="r"><span class="badge ${achCol}">${achInt}%</span></td>
+    <td class="r num">${normInt}%</td>
+    <td class="r num">${overShortDisplay}</td>
+    <td class="r num">${balanceDisplay}</td>
+  </tr>`;
+}
+
+// ─── AUTO-GENERATE HIGHLIGHTS COMMENTARY ─────────────────────────
+(function buildHighlights(){
+  const dtcAch  = DATA.dtcMTD  / DATA.dtcFC;
+  const amzAch  = DATA.amzMTD  / DATA.amzFC;
+  const wsAch   = DATA.wsMTD   / DATA.wsFC;
+  const totAch  = DATA.totalMTD / DATA.totalFC;
+
+  // Determine leading channel
+  const achMap = [
+    { name:'Amazon',    ach: amzAch,  color:'#e8d190' },
+    { name:'Wholesale', ach: wsAch,   color:'#8ed4a4' },
+    { name:'DTC',       ach: dtcAch,  color:'#c4b8e8' },
+  ].sort((a,b) => b.ach - a.ach);
+  const leader = achMap[0];
+  const laggard = achMap[achMap.length-1];
+
+  // Channel-specific highlights from wsChannels
+  const wsOver  = DATA.wsChannels.filter(c => c.fc > 0 && (c.actual+c.ooc)/c.fc >= 1.0);
+  const wsUnder = DATA.wsChannels.filter(c => c.fc > 0 && (c.actual+c.ooc)/c.fc < normPct && c.fc > 200000);
+
+  const leaderStr = `<span style="color:${leader.color};font-weight:600">${leader.name}</span> is leading the month at <strong>${Math.round(leader.ach*100)}% ACH</strong>`;
+
+  // Notable outperformers (>100% ACH or significantly above norm)
+  const stars = DATA.wsChannels
+    .filter(c => c.fc > 50000 && (c.actual+c.ooc)/c.fc >= normPct * 1.5)
+    .sort((a,b) => (b.actual+b.ooc)/b.fc - (a.actual+a.ooc)/a.fc)
+    .slice(0, 3)
+    .map(c => `${c.name} (${Math.round((c.actual+c.ooc)/c.fc*100)}% ACH)`);
+
+  let commentary = `${leaderStr} vs the ${normPctInt}% norm today.`;
+
+  if(stars.length > 0){
+    commentary += ` Wholesale standouts: <strong>${stars.join(', ')}</strong>.`;
+  }
+  if(laggard.ach < normPct * 0.8 && laggard.ach < 0.5){
+    commentary += ` <span style="color:#e8b9a5">${laggard.name} is tracking behind norm at ${Math.round(laggard.ach*100)}% ACH — watch closely.</span>`;
+  }
+
+  // YoY callout
+  const yoyPctVal = Math.round((DATA.totalMTD - DATA.totalLY) / DATA.totalLY * 100);
+  commentary += ` Total is running <strong>+${yoyPctVal}% vs same period last year</strong>.`;
+
+  document.getElementById('brief-leader-text').innerHTML = commentary;
+})();
+
+// (Channels tab merged into Monthly tab — see MONTHLY_DATA and initMonthlyTab above)
+
+// ─── YoY KPI cards ────────────────────────────────────────────────
+function yoyCard(label, current, ly, color){
+  const diff = current - ly;
+  const pctV = Math.round(diff/ly*100);
+  return `<div style="background:#fff;border-radius:8px;padding:16px;border:1px solid var(--cream-dark);border-top:3px solid ${color}">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--taupe);margin-bottom:5px">${label}</div>
+    <div style="font-size:26px;font-weight:700;color:var(--green)">${pctV>=0?'+':''}${pctV}%</div>
+    <div style="font-size:12px;color:var(--brown);margin-top:3px">${fmtM(ly)} → ${fmtM(current)}</div>
+    <div style="font-size:12px;color:var(--green);font-weight:600;margin-top:2px">${diff>=0?'+':''}${fmtK(diff)} added</div>
+  </div>`;
+}
+document.getElementById('yoy-kpis').innerHTML =
+  yoyCard('Total Growth',     DATA.totalMTD, DATA.totalLY, 'var(--accent)')+
+  yoyCard('DTC Growth',       DATA.dtcMTD,   DATA.dtcLY,   'var(--purple)')+
+  yoyCard('Amazon Growth',    DATA.amzMTD,   DATA.amzLY,   'var(--yellow)')+
+  yoyCard('Wholesale Growth', DATA.wsMTD,    DATA.wsLY,    'var(--green)');
+
+// ─── MONTHLY DATA (pre-loaded per month) ──────────────────────────
+// All channels follow the same Level 5 structure as the June tab.
+// For closed months OOC = 0 (all orders settled). Norm = 100% for closed months.
+const MONTHLY_DATA = {
+  jan: {
+    label:'January 2026', day:31, daysInMonth:31, closed:true,
+    channels:[
+      {name:'Kitsch DTC',              actual:13945123, ooc:0, fc:11753752},
+      {name:'Amazon',                  actual:17711873, ooc:0, fc:17298950},
+      {name:'Ulta Inc.',               actual:3181307,  ooc:0, fc:3259949},
+      {name:'Target',                  actual:6208025,  ooc:0, fc:6514350},
+      {name:'Faire',                   actual:1932484,  ooc:0, fc:1611845},
+      {name:'CVS Health',              actual:231229,   ooc:0, fc:258000},
+      {name:'Walgreens',               actual:220069,   ooc:0, fc:280000},
+      {name:'Walmart',                 actual:240997,   ooc:0, fc:479250},
+      {name:'Whole Foods/Sprouts',     actual:172645,   ooc:0, fc:165000},
+      {name:"Kohl's Inc.",             actual:70788,    ooc:0, fc:201000},
+      {name:'Meijer',                  actual:70328,    ooc:0, fc:63589},
+      {name:'Boots UK Ltd.',           actual:132543,   ooc:0, fc:73000},
+      {name:'HEB',                     actual:87934,    ooc:0, fc:75355},
+      {name:'KROGER',                  actual:907949,   ooc:0, fc:229000},
+      {name:'Nordstrom Rack/Hautelook',actual:418721,   ooc:0, fc:250000},
+      {name:'Scheels',                 actual:141757,   ooc:0, fc:63000},
+      {name:'Off-Price',               actual:1876087,  ooc:0, fc:900000},
+      {name:'Business Development',    actual:0,        ooc:0, fc:25250},
+      {name:'Grocery',                 actual:181176,   ooc:0, fc:160600},
+      {name:'Specialty',               actual:61080,    ooc:0, fc:272769},
+      {name:'International',           actual:295734,   ooc:0, fc:258300},
+      {name:'Other - Misc',            actual:408088,   ooc:0, fc:245700},
+    ]
+  },
+  feb: {
+    label:'February 2026', day:28, daysInMonth:28, closed:true,
+    channels:[
+      {name:'Kitsch DTC',              actual:14010126, ooc:0, fc:13061449},
+      {name:'Amazon',                  actual:17052573, ooc:0, fc:11520304},
+      {name:'Ulta Inc.',               actual:3334687,  ooc:0, fc:2232100},
+      {name:'Target',                  actual:2929223,  ooc:0, fc:4934000},
+      {name:'Faire',                   actual:1065497,  ooc:0, fc:758665},
+      {name:'CVS Health',              actual:228179,   ooc:0, fc:258000},
+      {name:'Walgreens',               actual:295008,   ooc:0, fc:280000},
+      {name:'Walmart',                 actual:567540,   ooc:0, fc:479250},
+      {name:'Whole Foods/Sprouts',     actual:120489,   ooc:0, fc:165000},
+      {name:"Kohl's Inc.",             actual:138360,   ooc:0, fc:201000},
+      {name:'Meijer',                  actual:42941,    ooc:0, fc:63589},
+      {name:'Boots UK Ltd.',           actual:0,        ooc:0, fc:73000},
+      {name:'HEB',                     actual:160657,   ooc:0, fc:75355},
+      {name:'KROGER',                  actual:82258,    ooc:0, fc:229000},
+      {name:'Nordstrom Rack/Hautelook',actual:492390,   ooc:0, fc:250000},
+      {name:'Scheels',                 actual:61436,    ooc:0, fc:63000},
+      {name:'Off-Price',               actual:1979916,  ooc:0, fc:900000},
+      {name:'Business Development',    actual:100000,   ooc:0, fc:25250},
+      {name:'Grocery',                 actual:126461,   ooc:0, fc:160600},
+      {name:'Specialty',               actual:107125,   ooc:0, fc:272769},
+      {name:'International',           actual:232810,   ooc:0, fc:258300},
+      {name:'Other - Misc',            actual:521024,   ooc:0, fc:245700},
+    ]
+  },
+  mar: {
+    label:'March 2026', day:31, daysInMonth:31, closed:true,
+    channels:[
+      {name:'Kitsch DTC',              actual:14452512, ooc:0, fc:14493768},
+      {name:'Amazon',                  actual:20068192, ooc:0, fc:14237263},
+      {name:'Ulta Inc.',               actual:3456857,  ooc:0, fc:3012691},
+      {name:'Target',                  actual:7182161,  ooc:0, fc:3901320},
+      {name:'Faire',                   actual:1275538,  ooc:0, fc:902575},
+      {name:'CVS Health',              actual:215855,   ooc:0, fc:258000},
+      {name:'Walgreens',               actual:293004,   ooc:0, fc:280000},
+      {name:'Walmart',                 actual:466269,   ooc:0, fc:479250},
+      {name:'Whole Foods/Sprouts',     actual:238454,   ooc:0, fc:165000},
+      {name:"Kohl's Inc.",             actual:220032,   ooc:0, fc:201000},
+      {name:'Meijer',                  actual:22950,    ooc:0, fc:63589},
+      {name:'Boots UK Ltd.',           actual:0,        ooc:0, fc:73000},
+      {name:'HEB',                     actual:108332,   ooc:0, fc:75355},
+      {name:'KROGER',                  actual:573138,   ooc:0, fc:229000},
+      {name:'Nordstrom Rack/Hautelook',actual:1416241,  ooc:0, fc:250000},
+      {name:'Scheels',                 actual:121365,   ooc:0, fc:63000},
+      {name:'Off-Price',               actual:1547901,  ooc:0, fc:900000},
+      {name:'Business Development',    actual:3970,     ooc:0, fc:25250},
+      {name:'Grocery',                 actual:139167,   ooc:0, fc:160600},
+      {name:'Specialty',               actual:186901,   ooc:0, fc:272769},
+      {name:'International',           actual:198935,   ooc:0, fc:258300},
+      {name:'Other - Misc',            actual:628718,   ooc:0, fc:245700},
+    ]
+  },
+  apr: {
+    label:'April 2026', day:30, daysInMonth:30, closed:true,
+    channels:[
+      // April actuals approximate from available data
+      {name:'Kitsch DTC',              actual:14100000, ooc:0, fc:13750254},
+      {name:'Amazon',                  actual:15016006, ooc:0, fc:12875821},
+      {name:'Ulta Inc.',               actual:3600000,  ooc:0, fc:3830951},
+      {name:'Target',                  actual:4300000,  ooc:0, fc:5925208},
+      {name:'Faire',                   actual:1200000,  ooc:0, fc:1302202},
+      {name:'CVS Health',              actual:180000,   ooc:0, fc:258000},
+      {name:'Walgreens',               actual:200000,   ooc:0, fc:280000},
+      {name:'Walmart',                 actual:400000,   ooc:0, fc:479250},
+      {name:'Whole Foods/Sprouts',     actual:140000,   ooc:0, fc:165000},
+      {name:"Kohl's Inc.",             actual:200000,   ooc:0, fc:201000},
+      {name:'Meijer',                  actual:98000,    ooc:0, fc:63589},
+      {name:'Boots UK Ltd.',           actual:0,        ooc:0, fc:73000},
+      {name:'HEB',                     actual:50000,    ooc:0, fc:75355},
+      {name:'KROGER',                  actual:100000,   ooc:0, fc:229000},
+      {name:'Nordstrom Rack/Hautelook',actual:140000,   ooc:0, fc:250000},
+      {name:'Scheels',                 actual:76000,    ooc:0, fc:63000},
+      {name:'Off-Price',               actual:1365000,  ooc:0, fc:900000},
+      {name:'Business Development',    actual:0,        ooc:0, fc:25250},
+      {name:'Grocery',                 actual:116000,   ooc:0, fc:160600},
+      {name:'Specialty',               actual:375000,   ooc:0, fc:272769},
+      {name:'International',           actual:83000,    ooc:0, fc:258300},
+      {name:'Other - Misc',            actual:443000,   ooc:0, fc:245700},
+    ]
+  },
+  may: {
+    label:'May 2026', day:31, daysInMonth:31, closed:true,
+    // FULL MONTH actuals — updated from June 2026 report YTD tab (col F)
+    channels:[
+      {name:'Kitsch DTC',              actual:17047687, ooc:0, fc:16307988},
+      {name:'Amazon',                  actual:18677740, ooc:0, fc:13889247},
+      {name:'Ulta Inc.',               actual:2056094,  ooc:0, fc:2844450},
+      {name:'Target',                  actual:3868225,  ooc:0, fc:3805200},
+      {name:'Faire',                   actual:1019107,  ooc:0, fc:999991},
+      {name:'CVS Health',              actual:223906,   ooc:0, fc:191000},
+      {name:'Walgreens',               actual:432778,   ooc:0, fc:280000},
+      {name:'Walmart',                 actual:726388,   ooc:0, fc:385700},
+      {name:'Whole Foods/Sprouts',     actual:135253,   ooc:0, fc:202000},
+      {name:"Kohl's Inc.",             actual:178468,   ooc:0, fc:178000},
+      {name:'Meijer',                  actual:97525,    ooc:0, fc:74589},
+      {name:'Boots UK Ltd.',           actual:0,        ooc:0, fc:78000},
+      {name:'HEB',                     actual:45606,    ooc:0, fc:76958},
+      {name:'KROGER',                  actual:483611,   ooc:0, fc:251000},
+      {name:'Nordstrom Rack/Hautelook',actual:141249,   ooc:0, fc:619000},
+      {name:'Scheels',                 actual:101624,   ooc:0, fc:115000},
+      {name:'Off-Price',               actual:1808949,  ooc:0, fc:900000},
+      {name:'Business Development',    actual:28485,    ooc:0, fc:3030},
+      {name:'Grocery',                 actual:137008,   ooc:0, fc:321200},
+      {name:'Specialty',               actual:378039,   ooc:0, fc:241202},
+      {name:'International',           actual:83181,    ooc:0, fc:145950},
+      {name:'Other - Misc',            actual:535599,   ooc:0, fc:389550},
+    ]
+  },
+  jun: {
+    label:'June 2026', day: DATA.asOfDay, daysInMonth: DATA.daysInMonth, closed: false,
+    // Live from DATA block — always current
+    channels: [
+      {name:'Kitsch DTC', actual:DATA.dtcActual, ooc:DATA.dtcOOC, fc:DATA.dtcFC},
+      {name:'Amazon',     actual:DATA.amzActual, ooc:DATA.amzOOC, fc:DATA.amzFC},
+      ...DATA.wsChannels
+    ]
+  }
+};
+
+// ─── MONTHLY TAB RENDERING ────────────────────────────────────────
+(function initMonthlyTab(){
+  const monthKeys = ['jan','feb','mar','apr','may','jun'];
+  const pillContainer = document.getElementById('month-pills');
+
+  // Build pills
+  monthKeys.forEach((key, i) => {
+    const d = MONTHLY_DATA[key];
+    const pill = document.createElement('button');
+    pill.textContent = MONTHS_SHORT[i];
+    pill.dataset.key = key;
+    pill.style.cssText = `
+      padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;
+      border:1px solid var(--sand);background:#fff;color:var(--charcoal);
+      cursor:pointer;letter-spacing:0.04em;transition:all .15s;
+    `;
+    pill.addEventListener('click', () => renderMonth(key));
+    pillContainer.appendChild(pill);
+  });
+
+  function renderMonth(key){
+    const d = MONTHLY_DATA[key];
+    const mIdx = monthKeys.indexOf(key);
+
+    // Update active pill
+    pillContainer.querySelectorAll('button').forEach(b => {
+      const active = b.dataset.key === key;
+      b.style.background = active ? 'var(--accent)' : '#fff';
+      b.style.color = active ? '#fff' : 'var(--charcoal)';
+      b.style.borderColor = active ? 'var(--accent)' : 'var(--sand)';
+    });
+
+    // Norm for this month
+    const mNorm = d.closed ? 1.0 : Math.min(d.day / d.daysInMonth, 1);
+    const mNormPct = Math.round(mNorm * 100);
+    const mStatus = d.closed ? 'Full month · Closed' : `Day ${d.day} of ${d.daysInMonth} · Norm ${mNormPct}%`;
+
+    document.getElementById('month-meta-label').textContent = mStatus;
+    document.getElementById('month-table-title').textContent = d.label + ' — Channel Detail';
+    document.getElementById('month-table-meta').textContent = mStatus + ' · All Level 5 channels';
+
+    // Aggregate totals
+    const totalActual = d.channels.reduce((s,c)=>s+c.actual+c.ooc,0);
+    const totalFC     = d.channels.reduce((s,c)=>s+c.fc,0);
+    const dtcRow      = d.channels.find(c=>c.name==='Kitsch DTC') || {actual:0,ooc:0,fc:1};
+    const amzRow      = d.channels.find(c=>c.name==='Amazon')      || {actual:0,ooc:0,fc:1};
+    const wsTotal     = d.channels.filter(c=>c.name!=='Kitsch DTC'&&c.name!=='Amazon').reduce((s,c)=>s+c.actual+c.ooc,0);
+    const wsFc        = d.channels.filter(c=>c.name!=='Kitsch DTC'&&c.name!=='Amazon').reduce((s,c)=>s+c.fc,0);
+
+    // KPI cards
+    function kpiCard(label, actual, fc, color){
+      const ach = fc>0?Math.round(actual/fc*100):0;
+      const achCol = ach>=100?'var(--green)':ach>=mNormPct*1?'var(--yellow)':'var(--red)';
+      return `<div style="background:#fff;border-radius:8px;padding:14px 16px;border:1px solid var(--cream-dark);border-top:3px solid ${color}">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--taupe);margin-bottom:4px">${label}</div>
+        <div style="font-size:20px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums">${fmtFull(actual)}</div>
+        <div style="font-size:11px;color:var(--taupe);margin:2px 0 6px">vs ${fmtFull(fc)} FC</div>
+        <div style="font-size:13px;font-weight:700;color:${achCol}">${ach}% ACH</div>
+      </div>`;
+    }
+    document.getElementById('month-kpi-row').innerHTML =
+      kpiCard('TOTAL',      totalActual,       totalFC,            'var(--accent)') +
+      kpiCard('DTC',        dtcRow.actual+dtcRow.ooc, dtcRow.fc,  'var(--purple)') +
+      kpiCard('AMAZON',     amzRow.actual+amzRow.ooc, amzRow.fc,  'var(--yellow)') +
+      kpiCard('WHOLESALE',  wsTotal,            wsFc,              'var(--green)');
+
+    // Detail table
+    const tbody = document.getElementById('month-detail-tbody');
+    let rows = '';
+    rows += `<tr class="group-row"><td colspan="9">Online</td></tr>`;
+
+    // DTC and Amazon first
+    ['Kitsch DTC','Amazon'].forEach(n=>{
+      const c = d.channels.find(ch=>ch.name===n);
+      if(c) rows += buildRow(c.name, c.actual, c.ooc, c.fc, mNorm);
+    });
+
+    rows += `<tr class="group-row"><td colspan="9">Wholesale</td></tr>`;
+
+    // All wholesale channels
+    d.channels.filter(c=>c.name!=='Kitsch DTC'&&c.name!=='Amazon').forEach(c=>{
+      rows += buildRow(c.name, c.actual, c.ooc, c.fc, mNorm);
+    });
+
+    // Totals
+    rows += buildRow('TOTAL', d.channels.reduce((s,c)=>s+c.actual,0), d.channels.reduce((s,c)=>s+c.ooc,0), totalFC, mNorm, true);
+    tbody.innerHTML = rows;
+  }
+
+  // Default: show most recent data month (June if current, May otherwise)
+  const defaultKey = DATA.dataMonth === 5 ? 'jun' : 'may';
+  renderMonth(defaultKey);
+})();
+
+// ─── CHARTS ───────────────────────────────────────────────────────
+Chart.defaults.font.family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif";
+Chart.defaults.font.size=11;
+Chart.defaults.color='#8c7b6b';
+const ACCENT='#c9734a',PURPLE='#8b7bb5',YELLOW='#c49a2b',GREEN='#4a7c59',TAUPE='#b5a898',BLUE='#3a6fa8';
+
+new Chart(document.getElementById('monthlyDetailChart'),{
+  type:'bar',
+  data:{labels:['Jan','Feb','Mar','Apr','May','Jun MTD'],
+  datasets:[
+    {label:'2026 Actual',data:[48.5,44.1,51.6,43.1,48.2,+(DATA.totalMTD/1e6).toFixed(1)],backgroundColor:ACCENT,borderRadius:4},
+    {label:'2025 Actual',data:[31.8,26.6,29.9,31.3,32.6,30.5],backgroundColor:'transparent',borderColor:BLUE,borderWidth:2,borderDash:[4,3],type:'line',pointRadius:4,pointBackgroundColor:BLUE}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:12}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: $${c.raw}M`}}},
+    scales:{x:{grid:{display:false},border:{display:false}},y:{grid:{color:'#ede7de'},border:{display:false},ticks:{callback:v=>'$'+v+'M'}}}}
+});
+
+new Chart(document.getElementById('ytdChart'),{
+  type:'bar',
+  data:{labels:['Kitsch DTC','Amazon','Wholesale','Total'],
+  datasets:[
+    {label:'2026 YTD Actual',data:[56.5,69.5,60.4,186.4],backgroundColor:[PURPLE,YELLOW,GREEN,ACCENT],borderRadius:4},
+    {label:'2026 Forecast',data:[53.0,54.7,52.9,160.6],backgroundColor:TAUPE,borderRadius:4},
+    {label:'LY 2025 YTD',data:[46.2,57.4,44.6,148.2],backgroundColor:'transparent',borderColor:BLUE,borderWidth:2,type:'line',pointRadius:5,pointBackgroundColor:BLUE}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:12}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: $${c.raw}M`}}},
+    scales:{x:{grid:{display:false},border:{display:false}},y:{grid:{color:'#ede7de'},border:{display:false},ticks:{callback:v=>'$'+v+'M'}}}}
+});
+
+new Chart(document.getElementById('yoyBarChart'),{
+  type:'bar',
+  data:{labels:['DTC','Amazon','Wholesale','Total'],
+  datasets:[
+    {label:'Jun 2025 (day 4 est.)',data:[1.3,1.5,1.3,4.1],backgroundColor:TAUPE,borderRadius:4},
+    {label:'Jun 2026 MTD',data:[+(DATA.dtcMTD/1e6).toFixed(1),+(DATA.amzMTD/1e6).toFixed(1),+(DATA.wsMTD/1e6).toFixed(1),+(DATA.totalMTD/1e6).toFixed(1)],backgroundColor:[PURPLE,YELLOW,GREEN,ACCENT],borderRadius:4}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:12}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: $${c.raw}M`}}},
+    scales:{x:{grid:{display:false},border:{display:false}},y:{grid:{color:'#ede7de'},border:{display:false},ticks:{callback:v=>'$'+v+'M'}}}}
+});
+
+// YoY growth % from NS SKU Report 2025 vs 2026 actuals
+new Chart(document.getElementById('yoyGrowthChart'),{
+  type:'line',
+  data:{labels:['Jan','Feb','Mar','Apr','May'],
+  datasets:[
+    {label:'Total YoY %',data:[53,66,73,38,48],borderColor:ACCENT,backgroundColor:'rgba(201,115,74,0.08)',fill:true,pointRadius:4,pointBackgroundColor:ACCENT,tension:0.3},
+    {label:'DTC',data:[42,40,41,47,42],borderColor:PURPLE,borderDash:[3,2],pointRadius:3,tension:0.3},
+    {label:'Amazon',data:[46,86,65,39,65],borderColor:YELLOW,borderDash:[3,2],pointRadius:3,tension:0.3},
+    {label:'Wholesale',data:[71,76,128,28,34],borderColor:GREEN,borderDash:[3,2],pointRadius:3,tension:0.3}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: +${c.raw}%`}}},
+    scales:{x:{grid:{display:false},border:{display:false}},y:{grid:{color:'#ede7de'},border:{display:false},ticks:{callback:v=>'+'+v+'%'},min:0}}}
+});
+</script>
+</body>
+</html>

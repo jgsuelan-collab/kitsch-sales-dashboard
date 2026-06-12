@@ -1,0 +1,22 @@
+{
+  "_comment": "Copy this file to config/dashboard_config.json and fill in your real values. NEVER commit dashboard_config.json to git.",
+
+  "vercel_token": "YOUR_VERCEL_TOKEN_HERE",
+  "vercel_project": "kitsch-sales-dashboard",
+
+  "netsuite_account_id": "4375687",
+  "netsuite_search_id": "customsearch1373",
+  "netsuite_ooc_report_id": "388",
+
+  "_tba_comment": "NetSuite Token-Based Auth (TBA) — get these from Setup > Users/Roles > Access Tokens",
+  "netsuite_consumer_key":    "YOUR_CONSUMER_KEY",
+  "netsuite_consumer_secret": "YOUR_CONSUMER_SECRET",
+  "netsuite_token_id":        "YOUR_TOKEN_ID",
+  "netsuite_token_secret":    "YOUR_TOKEN_SECRET",
+
+  "_ly_comment": "Last-year full-month actuals from NS SKU Analysis Report (Key Customer tab)",
+  "ly_june_dtc": 9688555,
+  "ly_june_amz": 11226952,
+  "ly_june_ws":  9559078,
+  "ly_month": 5
+}
