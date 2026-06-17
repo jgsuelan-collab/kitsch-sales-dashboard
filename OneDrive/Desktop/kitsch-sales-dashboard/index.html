@@ -96,7 +96,8 @@
   .section-meta{font-size:11px;color:var(--taupe);}
 
   /* ── Channel Cards ── */
-  .channel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+  .channel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px;}
+  .channel-card.full-width{grid-column:1/-1;}
   .channel-card{background:#fff;border-radius:8px;border:1px solid var(--cream-dark);overflow:hidden;}
   .ch-top{padding:14px 16px 12px;border-bottom:1px solid var(--cream-dark);}
   .ch-top.dtc{border-top:3px solid var(--purple);}
@@ -430,17 +431,18 @@ DATA.totalLY     = DATA.dtcLY + DATA.amzLY + DATA.wsLY;
           </div>
         </div>
         <div class="ch-events">
-          <div class="ev-label">June Events</div>
-          <div class="ev-line"><div class="ev-date">6/5</div><div class="ev-desc">Summer Box launch on Amazon</div></div>
-          <div class="ev-line"><div class="ev-date">6/9</div><div class="ev-desc">BOGO 60% Off All Bars — 24-hour flash sale</div></div>
-          <div class="ev-line"><div class="ev-date">6/11–6/16</div><div class="ev-desc">Extra 10% off select bundles (3+ items) with code</div></div>
-          <div class="ev-line"><div class="ev-date">6/17–7/4</div><div class="ev-desc">TikTok Summer Black Friday / Super Brand Day</div></div>
-          <div class="ev-line"><div class="ev-date">6/18–7/6</div><div class="ev-desc">Summer Black Friday — 30% Off Sitewide support</div></div>
+          <div class="ev-label">June Amazon Platform Events</div>
+          <div class="ev-line"><div class="ev-date">6/5</div><div class="ev-desc">Kitsch Summer Box launch on Amazon</div></div>
+          <div class="ev-line"><div class="ev-date">6/9</div><div class="ev-desc">Kitsch Flash Deal — BOGO 60% Off All Bars (24-hr)</div></div>
+          <div class="ev-line"><div class="ev-date">6/11–6/16</div><div class="ev-desc">Kitsch Bundle Promo — extra 10% off 3+ items</div></div>
+          <div class="ev-line"><div class="ev-date">6/21–6/22</div><div class="ev-desc">Amazon Pre-Prime Day Early Deals — Beauty & Hair Care</div></div>
+          <div class="ev-line"><div class="ev-date">6/23–6/26</div><div class="ev-desc">🔶 Amazon Prime Day 2026 — 4-day event, Beauty deals every 5 min</div></div>
+          <div class="ev-line"><div class="ev-date">6/27–6/30</div><div class="ev-desc">Amazon Post-Prime Day Deals — extended beauty offers</div></div>
         </div>
       </div>
 
       <!-- Wholesale -->
-      <div class="channel-card">
+      <div class="channel-card full-width">
         <div class="ch-top wholesale">
           <div class="ch-header">
             <div class="ch-name">Wholesale</div>
