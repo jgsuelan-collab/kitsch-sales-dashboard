@@ -207,26 +207,27 @@ const DATA = {
 
   // Wholesale: customsearch1373 actuals June 1–22 · Report 388 OOC (June ship dates, no Shopify)
   wsChannels: [
-    { name: 'Ulta Inc.',               actual: 3892425,  ooc: 363888,  fc: 3281200 },
-    { name: 'Target',                  actual: 9667837,  ooc: 799283,  fc: 4521640 },
-    { name: 'Faire',                   actual: 2158143,  ooc: 0,       fc: 975637  },
-    { name: 'CVS Health',              actual: 535196,   ooc: 0,       fc: 181000  },
-    { name: 'Walgreens',               actual: 3361957,  ooc: 26417,   fc: 230000  },
-    { name: 'Walmart',                 actual: 709402,   ooc: 3354,    fc: 315200  },
-    { name: 'Whole Foods/Sprouts',     actual: 0,        ooc: 167547,  fc: 163000  },
-    { name: "Kohl's Inc.",             actual: 550052,   ooc: 0,       fc: 66950   },
-    { name: 'Meijer',                  actual: 377503,   ooc: 0,       fc: 61538   },
-    { name: 'Boots UK Ltd.',           actual: 1205892,  ooc: 0,       fc: 95000   },
-    { name: 'HEB',                     actual: 0,        ooc: 16883,   fc: 162869  },
-    { name: 'KROGER',                  actual: 0,        ooc: 0,       fc: 289000  },
-    { name: 'Nordstrom Rack/Hautelook',actual: 0,        ooc: 365745,  fc: 394000  },
-    { name: 'Scheels',                 actual: 0,        ooc: 54690,   fc: 105000  },
-    { name: 'Off-Price',               actual: 1973902,  ooc: 70361,   fc: 900000  },
-    { name: 'Business Development',    actual: 0,        ooc: 0,       fc: 103020  },
-    { name: 'Grocery',                 actual: 33206,    ooc: 39034,   fc: 232100  },
-    { name: 'Specialty',               actual: 9677,     ooc: 8095,    fc: 224979  },
-    { name: 'International',           actual: 0,        ooc: 0,       fc: 150150  },
-    { name: 'Other - Misc',            actual: 6875711,  ooc: 108115,  fc: 328900  },
+    // ly = full-month June 2025 actual · Source: NS - 12 Kitsch Per SKU Analysis Report Dec 2025 (Key Customer tab)
+    { name: 'Ulta Inc.',               actual: 3892425,  ooc: 363888,  fc: 3281200, ly: 2524249 },
+    { name: 'Target',                  actual: 9667837,  ooc: 799283,  fc: 4521640, ly: 3091397 },
+    { name: 'Faire',                   actual: 2158143,  ooc: 0,       fc: 975637,  ly: 791201  },
+    { name: 'CVS Health',              actual: 535196,   ooc: 0,       fc: 181000,  ly: 122627  },
+    { name: 'Walgreens',               actual: 3361957,  ooc: 26417,   fc: 230000,  ly: 224387  },
+    { name: 'Walmart',                 actual: 709402,   ooc: 3354,    fc: 315200,  ly: 194586  },
+    { name: 'Whole Foods/Sprouts',     actual: 0,        ooc: 167547,  fc: 163000,  ly: 115500  },
+    { name: "Kohl's Inc.",             actual: 550052,   ooc: 0,       fc: 66950,   ly: 104276  },
+    { name: 'Meijer',                  actual: 377503,   ooc: 0,       fc: 61538,   ly: 65484   },
+    { name: 'Boots UK Ltd.',           actual: 1205892,  ooc: 0,       fc: 95000,   ly: 0       },
+    { name: 'HEB',                     actual: 0,        ooc: 16883,   fc: 162869,  ly: 0       },
+    { name: 'KROGER',                  actual: 0,        ooc: 0,       fc: 289000,  ly: 0       },
+    { name: 'Nordstrom Rack/Hautelook',actual: 0,        ooc: 365745,  fc: 394000,  ly: 0       },
+    { name: 'Scheels',                 actual: 0,        ooc: 54690,   fc: 105000,  ly: 0       },
+    { name: 'Off-Price',               actual: 1973902,  ooc: 70361,   fc: 900000,  ly: 906563  },
+    { name: 'Business Development',    actual: 0,        ooc: 0,       fc: 103020,  ly: 101750  },
+    { name: 'Grocery',                 actual: 33206,    ooc: 39034,   fc: 232100,  ly: 230126  },
+    { name: 'Specialty',               actual: 9677,     ooc: 8095,    fc: 224979,  ly: 200290  },
+    { name: 'International',           actual: 0,        ooc: 0,       fc: 150150,  ly: 240639  },
+    { name: 'Other - Misc',            actual: 6875711,  ooc: 108115,  fc: 328900,  ly: 646003  },
   ],
 
   // ── Forecasts (June 2026 — from June tab) ──
@@ -234,11 +235,11 @@ const DATA = {
   amzFC:     13768064,
   wsFC:      12781183,  // Sum of wsChannels[*].fc · Total FC = $41,102,095
 
-  // ── LY same period: June 1–22, 2025 (pro-rated June 2025 ÷ 30 × 22)
-  // Source: NS - 12 Kitsch Per SKU Analysis Report Dec 2025 (Key Customer tab)
-  dtcLY:     7104940,   // $9,688,555 Jun 2025 × 22/30
-  amzLY:     8230631,   // $11,226,952 Jun 2025 × 22/30
-  wsLY:      7009857,   // $9,559,078 Jun 2025 × 22/30
+  // ── LY full-month June 2025 · Source: NS - 12 Kitsch Per SKU Analysis Report Dec 2025 (Key Customer tab)
+  // JS pro-rates these by (asOfDay / daysInMonth) for same-period YoY comparisons
+  dtcLY:     9688555,
+  amzLY:     11226952,
+  wsLY:      9559078,
 };
 
 // ── Derived totals (auto-calculated, do not edit) ────────
@@ -252,7 +253,12 @@ DATA.totalOOC    = DATA.dtcOOC   + DATA.amzOOC   + DATA.wsOOC;
 DATA.totalMTD    = DATA.totalActual + DATA.totalOOC;
 DATA.totalFC     = DATA.dtcFC + DATA.amzFC + DATA.wsFC;
 DATA.daysInMonth = new Date(DATA.dataYear, DATA.dataMonth + 1, 0).getDate();
-DATA.totalLY     = DATA.dtcLY + DATA.amzLY + DATA.wsLY;
+// Pro-rate full-month LY to same period as actuals (asOfDay / daysInMonth)
+DATA.lyFactor = DATA.asOfDay / DATA.daysInMonth;
+DATA.dtcLYP   = Math.round(DATA.dtcLY * DATA.lyFactor);
+DATA.amzLYP   = Math.round(DATA.amzLY * DATA.lyFactor);
+DATA.wsLYP    = Math.round(DATA.wsLY  * DATA.lyFactor);
+DATA.totalLY  = DATA.dtcLYP + DATA.amzLYP + DATA.wsLYP;
 </script>
 
 <div class="header">
@@ -522,6 +528,7 @@ DATA.totalLY     = DATA.dtcLY + DATA.amzLY + DATA.wsLY;
             <th class="r">Norm %</th>
             <th class="r">Over / (Short) vs Norm</th>
             <th class="r">Balance to FC</th>
+            <th class="r">YoY %</th>
           </tr>
         </thead>
         <tbody id="month-detail-tbody"></tbody>
@@ -810,9 +817,9 @@ function renderCard(prefix, actual, ooc, mtd, fc, ly, color){
   document.getElementById(prefix+'-norm-mk').style.left = normPctInt+'%';
 }
 
-renderCard('dtc', DATA.dtcActual, DATA.dtcOOC, DATA.dtcMTD, DATA.dtcFC, DATA.dtcLY, 'purple');
-renderCard('amz', DATA.amzActual, DATA.amzOOC, DATA.amzMTD, DATA.amzFC, DATA.amzLY, 'yellow');
-renderCard('ws',  DATA.wsActual,  DATA.wsOOC,  DATA.wsMTD,  DATA.wsFC,  DATA.wsLY,  'green');
+renderCard('dtc', DATA.dtcActual, DATA.dtcOOC, DATA.dtcMTD, DATA.dtcFC, DATA.dtcLYP, 'purple');
+renderCard('amz', DATA.amzActual, DATA.amzOOC, DATA.amzMTD, DATA.amzFC, DATA.amzLYP, 'yellow');
+renderCard('ws',  DATA.wsActual,  DATA.wsOOC,  DATA.wsMTD,  DATA.wsFC,  DATA.wsLYP,  'green');
 
 // ─── DETAIL TABLE (mirrors Excel "June" tab layout) ──────────────
 const wsDrivers = {
@@ -838,7 +845,7 @@ const wsDrivers = {
   'Other - Misc':             'Various specialty channels',
 };
 
-function buildRow(name, actual, ooc, fc, norm, isTotal=false){
+function buildRow(name, actual, ooc, fc, norm, isTotal=false, lyFull=0){
   const mtd       = actual + ooc;
   const ach       = fc > 0 ? mtd / fc : 0;
   const achInt    = Math.round(ach * 100);
@@ -856,6 +863,10 @@ function buildRow(name, actual, ooc, fc, norm, isTotal=false){
   const balanceDisplay = balance <= 0
     ? `<span style="color:var(--green);font-weight:600">EXCEEDED</span>`
     : `<span style="color:var(--red);">-${fmtK(balance)}</span>`;
+  const lyP = Math.round(lyFull * DATA.lyFactor);
+  const yoyDisplay = lyP > 0
+    ? (() => { const p = Math.round((mtd - lyP)/lyP*100); return `<span style="color:${p>=0?'var(--green)':'var(--red)'};font-weight:600">${p>=0?'+':''}${p}%</span>`; })()
+    : `<span style="color:var(--taupe)">New</span>`;
 
   return `<tr ${trCls}>
     <td>${name}</td>
@@ -867,6 +878,7 @@ function buildRow(name, actual, ooc, fc, norm, isTotal=false){
     <td class="r num">${normInt}%</td>
     <td class="r num">${overShortDisplay}</td>
     <td class="r num">${balanceDisplay}</td>
+    <td class="r num">${yoyDisplay}</td>
   </tr>`;
 }
 
@@ -1155,23 +1167,25 @@ const MONTHLY_DATA = {
     // Detail table
     const tbody = document.getElementById('month-detail-tbody');
     let rows = '';
-    rows += `<tr class="group-row"><td colspan="9">Online</td></tr>`;
+    rows += `<tr class="group-row"><td colspan="10">Online</td></tr>`;
 
     // DTC and Amazon first
     ['Kitsch DTC','Amazon'].forEach(n=>{
       const c = d.channels.find(ch=>ch.name===n);
-      if(c) rows += buildRow(c.name, c.actual, c.ooc, c.fc, mNorm);
+      const lyFull = n==='Kitsch DTC' ? DATA.dtcLY : DATA.amzLY;
+      if(c) rows += buildRow(c.name, c.actual, c.ooc, c.fc, mNorm, false, lyFull);
     });
 
-    rows += `<tr class="group-row"><td colspan="9">Wholesale</td></tr>`;
+    rows += `<tr class="group-row"><td colspan="10">Wholesale</td></tr>`;
 
     // All wholesale channels
     d.channels.filter(c=>c.name!=='Kitsch DTC'&&c.name!=='Amazon').forEach(c=>{
-      rows += buildRow(c.name, c.actual, c.ooc, c.fc, mNorm);
+      rows += buildRow(c.name, c.actual, c.ooc, c.fc, mNorm, false, c.ly||0);
     });
 
     // Totals
-    rows += buildRow('TOTAL', d.channels.reduce((s,c)=>s+c.actual,0), d.channels.reduce((s,c)=>s+c.ooc,0), totalFC, mNorm, true);
+    const totalLYFull = DATA.dtcLY + DATA.amzLY + DATA.wsLY;
+    rows += buildRow('TOTAL', d.channels.reduce((s,c)=>s+c.actual,0), d.channels.reduce((s,c)=>s+c.ooc,0), totalFC, mNorm, true, totalLYFull);
     tbody.innerHTML = rows;
   }
 
