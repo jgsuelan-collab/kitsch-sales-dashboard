@@ -192,42 +192,43 @@
 const DATA = {
   // ── Reporting period ──────────────────────────────────
   // All dates based on California (Pacific) time — matches NetSuite
-  asOfDay:     22,      // Last day actuals were pulled (June 1–22, California time)
+  asOfDay:     23,      // Last day actuals were pulled (June 1–23)
   dataMonth:   5,       // 0-indexed: 5 = June
   dataYear:    2026,
 
   // ── Actuals as of asOfDay ───────────────────────────────
-  // DTC: from NetSuite customsearch1373 (Sales Summary by Customer & SKU) MTD
-  dtcActual:   26886173,
+  // Source: "6 Actuals vs Forecast for June 2026 - June 1 to June 23" · "June 1 to 23" tab
+  // Customers tagged to Level 5 via "4 Customer Masterfile - April 2026"
+  dtcActual:   10863591,
   dtcOOC:      0,
 
-  // Amazon: from NetSuite customsearch1373 MTD
-  amzActual:   34394630,
+  // Amazon: from same report
+  amzActual:   13066617,
   amzOOC:      0,
 
-  // Wholesale: customsearch1373 actuals June 1–22 · Report 388 OOC (June ship dates, no Shopify)
+  // Wholesale actuals: "June 1 to 23" tab · OOC: "OOC_updated" tab (June ship dates, Shopify excluded)
   wsChannels: [
     // ly = full-month June 2025 actual · Source: NS - 12 Kitsch Per SKU Analysis Report Dec 2025 (Key Customer tab)
-    { name: 'Ulta Inc.',               actual: 3892425,  ooc: 363888,  fc: 3281200, ly: 2524249 },
-    { name: 'Target',                  actual: 9667837,  ooc: 799283,  fc: 4521640, ly: 3091397 },
-    { name: 'Faire',                   actual: 2158143,  ooc: 0,       fc: 975637,  ly: 791201  },
-    { name: 'CVS Health',              actual: 535196,   ooc: 0,       fc: 181000,  ly: 122627  },
-    { name: 'Walgreens',               actual: 3361957,  ooc: 26417,   fc: 230000,  ly: 224387  },
-    { name: 'Walmart',                 actual: 709402,   ooc: 3354,    fc: 315200,  ly: 194586  },
-    { name: 'Whole Foods/Sprouts',     actual: 0,        ooc: 167547,  fc: 163000,  ly: 115500  },
-    { name: "Kohl's Inc.",             actual: 550052,   ooc: 0,       fc: 66950,   ly: 104276  },
-    { name: 'Meijer',                  actual: 377503,   ooc: 0,       fc: 61538,   ly: 65484   },
-    { name: 'Boots UK Ltd.',           actual: 1205892,  ooc: 0,       fc: 95000,   ly: 0       },
-    { name: 'HEB',                     actual: 0,        ooc: 16883,   fc: 162869,  ly: 0       },
-    { name: 'KROGER',                  actual: 0,        ooc: 0,       fc: 289000,  ly: 0       },
-    { name: 'Nordstrom Rack/Hautelook',actual: 0,        ooc: 365745,  fc: 394000,  ly: 0       },
-    { name: 'Scheels',                 actual: 0,        ooc: 54690,   fc: 105000,  ly: 0       },
-    { name: 'Off-Price',               actual: 1973902,  ooc: 70361,   fc: 900000,  ly: 906563  },
-    { name: 'Business Development',    actual: 0,        ooc: 0,       fc: 103020,  ly: 101750  },
-    { name: 'Grocery',                 actual: 33206,    ooc: 39034,   fc: 232100,  ly: 230126  },
-    { name: 'Specialty',               actual: 9677,     ooc: 8095,    fc: 224979,  ly: 200290  },
-    { name: 'International',           actual: 0,        ooc: 0,       fc: 150150,  ly: 240639  },
-    { name: 'Other - Misc',            actual: 6875711,  ooc: 108115,  fc: 328900,  ly: 646003  },
+    { name: 'Ulta Inc.',               actual:  1242863, ooc: 363888,  fc: 3281200, ly: 2524249 },
+    { name: 'Target',                  actual:  4294956, ooc: 965362,  fc: 4521640, ly: 3091397 },
+    { name: 'Faire',                   actual:   789982, ooc:  45058,  fc:  975637, ly:  791201 },
+    { name: 'CVS Health',              actual:   158240, ooc:      0,  fc:  181000, ly:  122627 },
+    { name: 'Walgreens',               actual:   907780, ooc:  20628,  fc:  230000, ly:  224387 },
+    { name: 'Walmart',                 actual:   278109, ooc: 105292,  fc:  315200, ly:  194586 },
+    { name: 'Whole Foods/Sprouts',     actual:        0, ooc: 167547,  fc:  163000, ly:  115500 },
+    { name: "Kohl's Inc.",             actual:   192252, ooc:      0,  fc:   66950, ly:  104276 },
+    { name: 'Meijer',                  actual:   132064, ooc:      0,  fc:   61538, ly:   65484 },
+    { name: 'Boots UK Ltd.',           actual:   241178, ooc:      0,  fc:   95000, ly:       0 },
+    { name: 'HEB',                     actual:   211838, ooc:  11537,  fc:  162869, ly:       0 },
+    { name: 'KROGER',                  actual:   362552, ooc:      0,  fc:  289000, ly:       0 },
+    { name: 'Nordstrom Rack/Hautelook',actual:   615228, ooc: 360580,  fc:  394000, ly:       0 },
+    { name: 'Scheels',                 actual:    76602, ooc:  53421,  fc:  105000, ly:       0 },
+    { name: 'Off-Price',               actual:  1077537, ooc:  70361,  fc:  900000, ly:  906563 },
+    { name: 'Business Development',    actual:        0, ooc:      0,  fc:  103020, ly:  101750 },
+    { name: 'Grocery',                 actual:   122425, ooc:  61134,  fc:  232100, ly:  230126 },
+    { name: 'Specialty',               actual:    67247, ooc:   2649,  fc:  224979, ly:  200290 },
+    { name: 'International',           actual:   119535, ooc:      0,  fc:  150150, ly:  240639 },
+    { name: 'Other - Misc',            actual:   405119, ooc:  33229,  fc:  328900, ly:  646003 },
   ],
 
   // ── Forecasts (June 2026 — from June tab) ──
