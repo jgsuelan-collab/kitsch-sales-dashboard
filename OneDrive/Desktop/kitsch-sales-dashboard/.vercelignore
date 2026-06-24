@@ -1,0 +1,6 @@
+*.xlsx
+*.csv
+*.py
+config/
+scripts/
+.claude/
