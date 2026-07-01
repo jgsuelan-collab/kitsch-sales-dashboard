@@ -197,22 +197,20 @@ const DATA = {
   dataYear:    2026,
 
   // ── Actuals as of asOfDay ───────────────────────────────
-  // Source: NetSuite customsearch1373 (June 2026, 35,908 rows) · Level 5 via Customer Masterfile
-  dtcActual:   15675478,
+  // Source: "6 Actuals vs Forecast for June 2026 - June 1 to June 30 dashboard test.xlsx" (July 1 pull)
+  dtcActual:   15772023,
   dtcOOC:      0,
 
   // Amazon: from customsearch1373 (Customer Category = Amazon)
-  amzActual:   18300721,
+  amzActual:   18340955,
   amzOOC:      0,
 
-  // Wholesale actuals: customsearch1373 (Jun 1–30 full month) mapped via Customer Masterfile
-  // Channels with numeric NS IDs (KROGER, Nordstrom, HEB, Scheels, International, Grocery, Specialty)
-  // estimated proportionally from June 26 channel mix scaled to Day 30 — pending NS admin fix
+  // Wholesale actuals: June 30 full-month final from verified Excel file
   wsChannels: [
     // ly = full-month June 2025 actual · Source: NS - 12 Kitsch Per SKU Analysis Report Dec 2025 (Key Customer tab)
     { name: 'Ulta Inc.',               actual:  1897938, ooc:       0,  fc: 3281200, ly: 2524249 },
-    { name: 'Target',                  actual:  4359895, ooc: 1118011,  fc: 4521640, ly: 3091397 },
-    { name: 'Faire',                   actual:  1022134, ooc:   75688,  fc:  975637, ly:  791201 },
+    { name: 'Target',                  actual:  4462375, ooc: 1118011,  fc: 4521640, ly: 3091397 },
+    { name: 'Faire',                   actual:  1042504, ooc:   75688,  fc:  975637, ly:  791201 },
     { name: 'CVS Health',              actual:   206050, ooc:       0,  fc:  181000, ly:  122627 },
     { name: 'Walgreens',               actual:   960479, ooc:   20628,  fc:  230000, ly:  224387 },
     { name: 'Walmart',                 actual:   375997, ooc:    3354,  fc:  315200, ly:  194586 },
@@ -220,16 +218,16 @@ const DATA = {
     { name: "Kohl's Inc.",             actual:   247824, ooc:       0,  fc:   66950, ly:  104276 },
     { name: 'Meijer',                  actual:   173131, ooc:       0,  fc:   61538, ly:   65484 },
     { name: 'Boots UK Ltd.',           actual:   241178, ooc:       0,  fc:   95000, ly:       0 },
-    { name: 'HEB',                     actual:   270627, ooc:       0,  fc:  162869, ly:       0 },
-    { name: 'KROGER',                  actual:   463167, ooc:       0,  fc:  289000, ly:       0 },
-    { name: 'Nordstrom Rack/Hautelook',actual:   785964, ooc:       0,  fc:  394000, ly:       0 },
-    { name: 'Scheels',                 actual:    97860, ooc:   15010,  fc:  105000, ly:       0 },
-    { name: 'Off-Price',               actual:  1077537, ooc:   12048,  fc:  900000, ly:  906563 },
+    { name: 'HEB',                     actual:   278749, ooc:       0,  fc:  162869, ly:       0 },
+    { name: 'KROGER',                  actual:   362552, ooc:       0,  fc:  289000, ly:       0 },
+    { name: 'Nordstrom Rack/Hautelook',actual:   975178, ooc:       0,  fc:  394000, ly:       0 },
+    { name: 'Scheels',                 actual:   114321, ooc:   15010,  fc:  105000, ly:       0 },
+    { name: 'Off-Price',               actual:  1183187, ooc:   12048,  fc:  900000, ly:  906563 },
     { name: 'Business Development',    actual:        0, ooc:       0,  fc:  103020, ly:  101750 },
-    { name: 'Grocery',                 actual:   155373, ooc:   14042,  fc:  232100, ly:  230126 },
-    { name: 'Specialty',               actual:    85610, ooc:    2649,  fc:  224979, ly:  200290 },
-    { name: 'International',           actual:   152708, ooc:       0,  fc:  150150, ly:  240639 },
-    { name: 'Other - Misc',            actual:   818584, ooc:   27143,  fc:  328900, ly:  646003 },
+    { name: 'Grocery',                 actual:   226757, ooc:   14042,  fc:  232100, ly:  230126 },
+    { name: 'Specialty',               actual:    70922, ooc:    2649,  fc:  224979, ly:  200290 },
+    { name: 'International',           actual:   126298, ooc:       0,  fc:  150150, ly:  240639 },
+    { name: 'Other - Misc',            actual:   647830, ooc:   27143,  fc:  328900, ly:  646003 },
   ],
 
   // ── Forecasts (June 2026 — from June tab) ──
