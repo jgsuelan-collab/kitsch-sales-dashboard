@@ -27,24 +27,6 @@ NAME_CHANNEL_OVERRIDE = [
     ('boots uk',        'Boots UK Ltd.'),
     ('whole foods',     'Whole Foods/Sprouts'),
     ('sprouts',         'Whole Foods/Sprouts'),
-    # Grocery stores
-    ('bristol farms',   'Grocery'),
-    ('lakewinds',       'Grocery'),
-    ('new leaf community', 'Grocery'),
-    ('fruitful yield',  'Grocery'),
-    ('island naturals', 'Grocery'),
-    ('plum market',     'Grocery'),
-    ('river valley (cavallaro)', 'Grocery'),
-    ('boxout llc',      'Grocery'),
-    # Specialty stores
-    ('mickey fine',     'Specialty'),
-    ('nigel beauty',    'Specialty'),
-    ('planet beauty',   'Specialty'),
-    ('face & body emporium', 'Specialty'),
-    ('kirei beauty',    'Specialty'),
-    ('the paper store', 'Specialty'),
-    ('nexcom',          'Specialty'),
-    ('aafes',           'Specialty'),
 ]
 
 def name_override(customer_name):
