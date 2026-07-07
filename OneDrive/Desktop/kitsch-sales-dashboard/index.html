@@ -192,54 +192,54 @@
 const DATA = {
   // ── Reporting period ──────────────────────────────────
   // All dates based on California (Pacific) time — matches NetSuite
-  asOfDay:     30,      // June final — full month closed (July 1 pull)
-  dataMonth:   5,       // 0-indexed: 5 = June
+  asOfDay:     7,       // July 7 pull
+  dataMonth:   6,       // 0-indexed: 6 = July
   dataYear:    2026,
 
   // ── Actuals as of asOfDay ───────────────────────────────
-  // Source: NetSuite customsearch1373 · June 2026 full month (39,534 rows) · July 1 pull
-  dtcActual:   15926741,
+  // Source: NetSuite customsearch1373 · July 2026 MTD (7,169 rows) · July 7 pull
+  dtcActual:   3135333,
   dtcOOC:      0,
 
   // Amazon: from customsearch1373 (Customer Category = Amazon)
-  amzActual:   18401636,
+  amzActual:   634056,
   amzOOC:      0,
 
   // Wholesale actuals: customsearch1373 mapped via Customer Masterfile + ID lookup
   wsChannels: [
-    // ly = full-month June 2025 actual · Source: NS - 12 Kitsch Per SKU Analysis Report Dec 2025 (Key Customer tab)
-    { name: 'Ulta Inc.',               actual:  1897938, ooc:       0,  fc: 3281200, ly: 2524249 },
-    { name: 'Target',                  actual:  4462375, ooc: 1118011,  fc: 4521640, ly: 3091397 },
-    { name: 'Faire',                   actual:  1062716, ooc:   75688,  fc:  975637, ly:  791201 },
-    { name: 'CVS Health',              actual:   206050, ooc:       0,  fc:  181000, ly:  122627 },
-    { name: 'Walgreens',               actual:   960479, ooc:   20628,  fc:  230000, ly:  224387 },
-    { name: 'Walmart',                 actual:   375997, ooc:    3354,  fc:  315200, ly:  194586 },
-    { name: 'Whole Foods/Sprouts',     actual:   167547, ooc:       0,  fc:  163000, ly:  115500 },
-    { name: "Kohl's Inc.",             actual:   247824, ooc:       0,  fc:   66950, ly:  104276 },
-    { name: 'Meijer',                  actual:   173131, ooc:       0,  fc:   61538, ly:   65484 },
-    { name: 'Boots UK Ltd.',           actual:   241178, ooc:       0,  fc:   95000, ly:       0 },
-    { name: 'HEB',                     actual:   278749, ooc:       0,  fc:  162869, ly:       0 },
-    { name: 'KROGER',                  actual:   362552, ooc:       0,  fc:  289000, ly:       0 },
-    { name: 'Nordstrom Rack/Hautelook',actual:   975178, ooc:       0,  fc:  394000, ly:       0 },
-    { name: 'Scheels',                 actual:   128474, ooc:   15010,  fc:  105000, ly:       0 },
-    { name: 'Off-Price',               actual:  1178885, ooc:   12048,  fc:  900000, ly:  906563 },
-    { name: 'Business Development',    actual:        0, ooc:       0,  fc:  103020, ly:  101750 },
-    { name: 'Grocery',                 actual:    12862, ooc:   14042,  fc:  232100, ly:  230126 },
-    { name: 'Specialty',               actual:     5467, ooc:    2649,  fc:  224979, ly:  200290 },
-    { name: 'International',           actual:    59558, ooc:       0,  fc:  150150, ly:  240639 },
-    { name: 'Other - Misc',            actual:  1015439, ooc:   27143,  fc:  328900, ly:  646003 },
+    // ly = full-month July 2025 · Source: NS - 12 Kitsch Per SKU Analysis Report Dec 2025 (Key Customer tab)
+    // fc = July 2026 Stretch Forecast · Source: YTD tab col AM
+    { name: 'Ulta Inc.',               actual:  139731, ooc: 0,  fc: 4027624, ly: 3136646 },
+    { name: 'Target',                  actual:       0, ooc: 0,  fc: 5569388, ly: 3399880 },
+    { name: 'Faire',                   actual:  110342, ooc: 0,  fc: 1479322, ly: 1245536 },
+    { name: 'CVS Health',              actual:   34578, ooc: 0,  fc:  186000, ly:  201966 },
+    { name: 'Walgreens',               actual:       0, ooc: 0,  fc:  288000, ly:  236404 },
+    { name: 'Walmart',                 actual:    7702, ooc: 0,  fc:  522200, ly:  373398 },
+    { name: 'Whole Foods/Sprouts',     actual:       0, ooc: 0,  fc:  153000, ly:   99502 },
+    { name: "Kohl's Inc.",             actual:    7580, ooc: 0,  fc:   78058, ly:  225308 },
+    { name: 'Meijer',                  actual:    3215, ooc: 0,  fc:   63589, ly:   54519 },
+    { name: 'Boots UK Ltd.',           actual:       0, ooc: 0,  fc:   72000, ly:       0 },
+    { name: 'HEB',                     actual:    3485, ooc: 0,  fc:   90649, ly:       0 },
+    { name: 'KROGER',                  actual:   90115, ooc: 0,  fc:  358000, ly:       0 },
+    { name: 'Nordstrom Rack/Hautelook',actual:      94, ooc: 0,  fc:  700000, ly:       0 },
+    { name: 'Scheels',                 actual:   11080, ooc: 0,  fc:  125000, ly:       0 },
+    { name: 'Off-Price',               actual:  181246, ooc: 0,  fc:  900000, ly:  545956 },
+    { name: 'Business Development',    actual:       0, ooc: 0,  fc:       0, ly:       0 },
+    { name: 'Grocery',                 actual:    3831, ooc: 0,  fc:  249700, ly:  332879 },
+    { name: 'Specialty',               actual:    1143, ooc: 0,  fc:  215600, ly:  196498 },
+    { name: 'International',           actual:       0, ooc: 0,  fc:  151200, ly:  219941 },
+    { name: 'Other - Misc',            actual:  161353, ooc: 0,  fc:  488250, ly: 1176352 },
   ],
 
-  // ── Forecasts (June 2026 — from June tab) ──
-  dtcFC:     14552848,
-  amzFC:     13768064,
-  wsFC:      12781183,  // Sum of wsChannels[*].fc · Total FC = $41,102,095
+  // ── Forecasts (July 2026 — Stretch · YTD tab col AM) ──
+  dtcFC:     14987379,
+  amzFC:     16887635,
+  wsFC:      15717630,  // Sum of wsChannels[*].fc · Total Stretch FC = $47,592,644
 
-  // ── LY full-month June 2025 · Source: NS - 12 Kitsch Per SKU Analysis Report Dec 2025 (Key Customer tab)
-  // JS pro-rates these by (asOfDay / daysInMonth) for same-period YoY comparisons
-  dtcLY:     9688555,
-  amzLY:     11226952,
-  wsLY:      9559078,
+  // ── LY full-month July 2025 · Source: NS - 12 Kitsch Per SKU Analysis Report Dec 2025
+  dtcLY:     10343464,
+  amzLY:     13512304,
+  wsLY:      11444783,
 };
 
 // ── Derived totals (auto-calculated, do not edit) ────────
@@ -392,14 +392,9 @@ DATA.totalLY  = DATA.dtcLYP + DATA.amzLYP + DATA.wsLYP;
           </div>
         </div>
         <div class="ch-events">
-          <div class="ev-label">June Promotions & Launches</div>
-          <div class="ev-line"><div class="ev-date">6/2–6/4</div><div class="ev-desc">40% Off — Celebrate Your Curls / Curling Campaign</div></div>
-          <div class="ev-line"><div class="ev-date">6/5</div><div class="ev-desc">Summer Box launch — DTC + Amazon</div></div>
-          <div class="ev-line"><div class="ev-date">6/9</div><div class="ev-desc">24-Hr Flash Sale — BOGO 60% Off All Bars</div></div>
-          <div class="ev-line"><div class="ev-date">6/11–6/16</div><div class="ev-desc">Extra 10% off select bundles (3+ items) with code</div></div>
-          <div class="ev-line"><div class="ev-date">6/12–6/14</div><div class="ev-desc">GWP $35+: Hair Perfume Sampler</div></div>
-          <div class="ev-line"><div class="ev-date">6/17–7/4</div><div class="ev-desc">TikTok Summer BF / Super Brand Day</div></div>
-          <div class="ev-line"><div class="ev-date">6/18–7/6</div><div class="ev-desc">Summer Black Friday — 30% Off Sitewide</div></div>
+          <div class="ev-label">July Promotions & Launches</div>
+          <div class="ev-line"><div class="ev-date">7/1–7/6</div><div class="ev-desc">Summer Black Friday — 30% Off Sitewide (cont'd)</div></div>
+          <div class="ev-line"><div class="ev-date">7/4</div><div class="ev-desc">Independence Day — TikTok Summer BF / Super Brand Day</div></div>
         </div>
       </div>
 
@@ -437,13 +432,8 @@ DATA.totalLY  = DATA.dtcLYP + DATA.amzLYP + DATA.wsLYP;
           </div>
         </div>
         <div class="ch-events">
-          <div class="ev-label">June Amazon Platform Events</div>
-          <div class="ev-line"><div class="ev-date">6/5</div><div class="ev-desc">Kitsch Summer Box launch on Amazon</div></div>
-          <div class="ev-line"><div class="ev-date">6/9</div><div class="ev-desc">Kitsch Flash Deal — BOGO 60% Off All Bars (24-hr)</div></div>
-          <div class="ev-line"><div class="ev-date">6/11–6/16</div><div class="ev-desc">Kitsch Bundle Promo — extra 10% off 3+ items</div></div>
-          <div class="ev-line"><div class="ev-date">6/21–6/22</div><div class="ev-desc">Amazon Pre-Prime Day Early Deals — Beauty & Hair Care</div></div>
-          <div class="ev-line"><div class="ev-date">6/23–6/26</div><div class="ev-desc">🔶 Amazon Prime Day 2026 — 4-day event, Beauty deals every 5 min</div></div>
-          <div class="ev-line"><div class="ev-date">6/27–6/30</div><div class="ev-desc">Amazon Post-Prime Day Deals — extended beauty offers</div></div>
+          <div class="ev-label">July Amazon Platform Events</div>
+          <div class="ev-line"><div class="ev-date">7/4</div><div class="ev-desc">Independence Day deals — Beauty & Hair Care</div></div>
         </div>
       </div>
 
@@ -481,13 +471,8 @@ DATA.totalLY  = DATA.dtcLYP + DATA.amzLYP + DATA.wsLYP;
           </div>
         </div>
         <div class="ch-events">
-          <div class="ev-label">June Wholesale Events</div>
-          <div class="ev-line"><div class="ev-date">6/1</div><div class="ev-desc">Walgreens June Reset + Door Expansion (new items)</div></div>
-          <div class="ev-line"><div class="ev-date">6/1</div><div class="ev-desc">Grocery channel new item ship-in</div></div>
-          <div class="ev-line"><div class="ev-date">6/5</div><div class="ev-desc">HEB Back to School Display — new item ship-in</div></div>
-          <div class="ev-line"><div class="ev-date">6/14</div><div class="ev-desc">Ulta Wk 27 Back-to-College Etagere (secondary event)</div></div>
-          <div class="ev-line"><div class="ev-date">6/17</div><div class="ev-desc">HEB One-Time Ship + Kroger Hair Care Reset</div></div>
-          <div class="ev-line"><div class="ev-date">6/28</div><div class="ev-desc">Target Gratis · Sephora SEA One-Time Ship</div></div>
+          <div class="ev-label">July Wholesale Events</div>
+          <div class="ev-line"><div class="ev-date">7/1</div><div class="ev-desc">TJX Q2 production flowing — July ship-in</div></div>
         </div>
       </div>
 
@@ -595,7 +580,7 @@ DATA.totalLY  = DATA.dtcLYP + DATA.amzLYP + DATA.wsLYP;
       <div class="section-title">Year-over-Year Comparison</div>
       <div class="section-meta">Same MTD period — LY vs Current Year</div>
     </div>
-    <!-- YoY KPIs: June 2026 MTD Day 4 vs June 2025 Day 4 est. (pro-rated from NS SKU Report) -->
+    <!-- YoY KPIs: July 2026 MTD Day 7 vs July 2025 Day 7 est. (pro-rated from LY full month) -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;" id="yoy-kpis"></div>
     <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:18px;">
       <div class="chart-card" style="margin-bottom:0">
@@ -681,7 +666,7 @@ document.getElementById('hdr-asof').textContent =
 document.getElementById('brief-label').textContent =
   '⚡ Command Brief — '+reportingLabel+' · Viewing Day '+viewingDay+' of '+DATA.daysInMonth;
 
-const totalACH  = DATA.totalMTD / DATA.totalFC;
+const totalACH  = DATA.totalFC > 0 ? DATA.totalMTD / DATA.totalFC : 0;
 const achPctInt = Math.round(totalACH * 100);
 const normPctInt= Math.round(normPct * 100);
 const gapPt     = achPctInt - normPctInt;
@@ -723,7 +708,7 @@ const sprintCtx = document.getElementById('sprint-ctx');
 const sprintRow = document.getElementById('sprint-row');
 
 function renderSprint(cls, label, actual, ooc, mtd, fc, normFr, daysLeft, daysInMo, asOfD){
-  const ach        = mtd / fc;
+  const ach        = fc > 0 ? mtd / fc : 0;
   const balance    = fc - mtd;
   const dailyRate  = actual / asOfD;                    // run rate from data date
   const projClose  = actual + dailyRate*(daysInMo - asOfD); // extrapolated to month end
@@ -780,12 +765,12 @@ if(isAfterMonth){
 
 // ─── CHANNEL CARDS ────────────────────────────────────────────────
 function renderCard(prefix, actual, ooc, mtd, fc, ly, color){
-  const ach      = mtd / fc;
+  const ach      = fc > 0 ? mtd / fc : 0;
   const achInt   = Math.round(ach*100);
   const balance  = fc - mtd;
   const achCol   = achColor(ach, normPct);
   const yoyAmt   = mtd - ly;
-  const yoyP     = Math.round(yoyAmt/ly*100);
+  const yoyP     = ly > 0 ? Math.round(yoyAmt/ly*100) : 0;
   const normPctStr = normPctInt+'%';
 
   document.getElementById(prefix+'-actual-display').textContent = fmtM(mtd);
@@ -813,13 +798,13 @@ renderCard('dtc', DATA.dtcActual, DATA.dtcOOC, DATA.dtcMTD, DATA.dtcFC, DATA.dtc
 renderCard('amz', DATA.amzActual, DATA.amzOOC, DATA.amzMTD, DATA.amzFC, DATA.amzLYP, 'yellow');
 renderCard('ws',  DATA.wsActual,  DATA.wsOOC,  DATA.wsMTD,  DATA.wsFC,  DATA.wsLYP,  'green');
 
-// ─── DETAIL TABLE (mirrors Excel "June" tab layout) ──────────────
+// ─── DETAIL TABLE ──────────────────────────────────────────────────
 const wsDrivers = {
-  'Target':                   'Coastal Cottage Endcap + July Haircare Transition ship-in',
-  'Ulta Inc.':                'Wk 27 Back-to-College Etagere',
-  'Off-Price':                'TJX Q2 Production flowing — June & July',
+  'Target':                   'July Haircare Transition ship-in',
+  'Ulta Inc.':                'Back-to-College Etagere',
+  'Off-Price':                'TJX Q2 Production flowing',
   'Faire':                    'Steady wholesale momentum',
-  'Walgreens':                'June Reset & Door Expansion',
+  'Walgreens':                'Replenishment',
   'Walmart':                  'Replenishment recovery',
   'Whole Foods/Sprouts':      'Seasonal replenishment',
   "Kohl's Inc.":              'Seasonal transition',
@@ -876,10 +861,10 @@ function buildRow(name, actual, ooc, fc, norm, isTotal=false, lyFull=0){
 
 // ─── AUTO-GENERATE HIGHLIGHTS COMMENTARY ─────────────────────────
 (function buildHighlights(){
-  const dtcAch  = DATA.dtcMTD  / DATA.dtcFC;
-  const amzAch  = DATA.amzMTD  / DATA.amzFC;
-  const wsAch   = DATA.wsMTD   / DATA.wsFC;
-  const totAch  = DATA.totalMTD / DATA.totalFC;
+  const dtcAch  = DATA.dtcFC   > 0 ? DATA.dtcMTD   / DATA.dtcFC   : 0;
+  const amzAch  = DATA.amzFC   > 0 ? DATA.amzMTD   / DATA.amzFC   : 0;
+  const wsAch   = DATA.wsFC    > 0 ? DATA.wsMTD    / DATA.wsFC    : 0;
+  const totAch  = DATA.totalFC > 0 ? DATA.totalMTD / DATA.totalFC : 0;
 
   // Determine leading channel
   const achMap = [
@@ -1080,7 +1065,35 @@ const MONTHLY_DATA = {
     ]
   },
   jun: {
-    label:'June 2026', day: DATA.asOfDay, daysInMonth: DATA.daysInMonth, closed: false,
+    label:'June 2026', day: 30, daysInMonth: 30, closed: true,
+    // Final June 2026 actuals — NetSuite customsearch1373 · 39,534 rows · July 1 pull
+    channels: [
+      {name:'Kitsch DTC',              actual:15926741, ooc:      0, fc:14552848},
+      {name:'Amazon',                  actual:18401636, ooc:      0, fc:13768064},
+      {name:'Ulta Inc.',               actual: 1897938, ooc:      0, fc: 3281200},
+      {name:'Target',                  actual: 4462375, ooc:1118011, fc: 4521640},
+      {name:'Faire',                   actual: 1062716, ooc:  75688, fc:  975637},
+      {name:'CVS Health',              actual:  206050, ooc:      0, fc:  181000},
+      {name:'Walgreens',               actual:  960479, ooc:  20628, fc:  230000},
+      {name:'Walmart',                 actual:  375997, ooc:   3354, fc:  315200},
+      {name:'Whole Foods/Sprouts',     actual:  167547, ooc:      0, fc:  163000},
+      {name:"Kohl's Inc.",             actual:  247824, ooc:      0, fc:   66950},
+      {name:'Meijer',                  actual:  173131, ooc:      0, fc:   61538},
+      {name:'Boots UK Ltd.',           actual:  241178, ooc:      0, fc:   95000},
+      {name:'HEB',                     actual:  278749, ooc:      0, fc:  162869},
+      {name:'KROGER',                  actual:  362552, ooc:      0, fc:  289000},
+      {name:'Nordstrom Rack/Hautelook',actual:  975178, ooc:      0, fc:  394000},
+      {name:'Scheels',                 actual:  128474, ooc:  15010, fc:  105000},
+      {name:'Off-Price',               actual: 1178885, ooc:  12048, fc:  900000},
+      {name:'Business Development',    actual:       0, ooc:      0, fc:  103020},
+      {name:'Grocery',                 actual:   12862, ooc:  14042, fc:  232100},
+      {name:'Specialty',               actual:    5467, ooc:   2649, fc:  224979},
+      {name:'International',           actual:   59558, ooc:      0, fc:  150150},
+      {name:'Other - Misc',            actual: 1015439, ooc:  27143, fc:  328900},
+    ]
+  },
+  jul: {
+    label:'July 2026', day: DATA.asOfDay, daysInMonth: DATA.daysInMonth, closed: false,
     // Live from DATA block — always current
     channels: [
       {name:'Kitsch DTC', actual:DATA.dtcActual, ooc:DATA.dtcOOC, fc:DATA.dtcFC},
@@ -1092,7 +1105,7 @@ const MONTHLY_DATA = {
 
 // ─── MONTHLY TAB RENDERING ────────────────────────────────────────
 (function initMonthlyTab(){
-  const monthKeys = ['jan','feb','mar','apr','may','jun'];
+  const monthKeys = ['jan','feb','mar','apr','may','jun','jul'];
   const pillContainer = document.getElementById('month-pills');
 
   // Build pills
@@ -1181,8 +1194,8 @@ const MONTHLY_DATA = {
     tbody.innerHTML = rows;
   }
 
-  // Default: show most recent data month (June if current, May otherwise)
-  const defaultKey = DATA.dataMonth === 5 ? 'jun' : 'may';
+  // Default: show most recent data month
+  const defaultKey = DATA.dataMonth === 6 ? 'jul' : DATA.dataMonth === 5 ? 'jun' : 'may';
   renderMonth(defaultKey);
 })();
 
@@ -1194,6 +1207,8 @@ const LY_MONTHLY = {
   mar: { label:'March',           dtc:10218985,  amz: 12151982, total: 29897387 },
   apr: { label:'April',           dtc: 9560434,  amz: 10821630, total: 31323317 },
   may: { label:'May (Full Month)',dtc:11985793,  amz: 11290331, total: 32551232 },
+  jun: { label:'June',            dtc: 9688555,  amz: 11226952, total: 30474585 },
+  jul: { label:'July',            dtc: 10343464,  amz: 13512304, total: 35300551 },
 };
 
 (function buildYoYTable(){
@@ -1203,7 +1218,7 @@ const LY_MONTHLY = {
   function fmt(v){ return '$'+(v/1e6).toFixed(1)+'M'; }
   function sign(v){ return (v>=0?'+':'')+fmt(Math.abs(v)); }
 
-  const keys = ['jan','feb','mar','apr','may'];
+  const keys = ['jan','feb','mar','apr','may','jun'];
   let ytd26 = 0, ytd25 = 0, ytdDtc26 = 0, ytdDtc25 = 0, ytdAmz26 = 0, ytdAmz25 = 0;
   let rows = '';
 
@@ -1233,14 +1248,15 @@ const LY_MONTHLY = {
     </tr>`;
   });
 
-  // June MTD row (partial month — actuals only, no full-month comp)
+  // Current month MTD row (partial month — actuals only, no full-month comp)
   const junLYP = DATA.totalLY; // pro-rated
   const junP   = pct(DATA.totalMTD, junLYP);
   const junDtcP = pct(DATA.dtcMTD, DATA.dtcLYP);
   const junAmzP = pct(DATA.amzMTD, DATA.amzLYP);
   const junWsP  = pct(DATA.wsMTD,  DATA.wsLYP);
+  const curMonthName = MONTHS[DATA.dataMonth];
   rows += `<tr>
-    <td>June (Day ${DATA.asOfDay} MTD)</td>
+    <td>${curMonthName} (Day ${DATA.asOfDay} MTD)</td>
     <td class="r num">${fmt(junLYP)}</td>
     <td class="r num">${fmt(DATA.totalMTD)}</td>
     <td class="r num" ${col(DATA.totalMTD-junLYP)}>${sign(DATA.totalMTD-junLYP)}</td>
@@ -1259,7 +1275,7 @@ const LY_MONTHLY = {
   const ytdWs26   = ytdTot26 - ytdDtc26t - ytdAmz26t;
   const ytdWs25   = ytdTot25 - ytdDtc25t - ytdAmz25t;
   rows += `<tr class="total-row">
-    <td>YTD (Jan–Jun MTD)</td>
+    <td>YTD (Jan–${MONTHS_SHORT[DATA.dataMonth]} MTD)</td>
     <td class="r num">${fmt(ytdTot25)}</td>
     <td class="r num">${fmt(ytdTot26)}</td>
     <td class="r num" ${col(ytdG)}>${sign(ytdG)}</td>
